@@ -1,0 +1,45 @@
+.statistics {
+  background: white;
+  padding: 4rem 2rem;
+}
+
+.statistics-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
+  text-align: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-number {
+  font-size: clamp(2.5rem, 4vw, 4rem);
+  font-weight: 800;
+  color: #DC2626;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.stat-label {
+  font-size: 1.125rem;
+  color: #6B7280;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 768px) {
+  .statistics {
+    padding: 3rem 1.5rem;
+  }
+
+  .statistics-container {
+    gap: 2rem;
+  }
+}
+
