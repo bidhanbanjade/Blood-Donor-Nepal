@@ -149,11 +149,53 @@ The frontend will be available at `http://localhost:5173`
 - Integrated Google Fonts (Inter) for improved typography
 - Responsive design with modern CSS styling
 
-### Next Steps
-- Database schema and migrations
-- User authentication implementation
-- API endpoints development
-- Connect frontend to backend APIs
+### Implemented API Milestones
+
+- Database migration added at `database/migrations/001_initial_schema.sql`
+- Auth endpoints added:
+  - `POST /api/auth/register`
+  - `POST /api/auth/login`
+  - `GET /api/auth/me`
+  - `POST /api/auth/logout`
+- Role-based middleware for: donor, hospital, blood_bank, admin
+- Core APIs added:
+  - `CRUD /api/donors`
+  - `GET /api/donors/me`
+  - `CRUD /api/hospitals`
+  - `GET/POST /api/inventory`
+  - `GET/POST /api/donations`
+  - `GET/POST /api/feedback`
+  - `GET /api/blood-banks/search?lat=&lng=&radius=`
+  - `POST /api/blood-banks/urgent-request` (blood_bank geofenced alert)
+  - `POST /api/alerts/trigger` (admin/hospital)
+  - `POST /api/alerts/subscribe`
+- Chatbot APIs:
+  - `GET /api/chatbot/agent-card`
+  - `POST /api/chatbot/task`
+- Tests added for auth, inventory, and alerts using Jest + Supertest
+
+### Frontend Milestones
+
+- Google Maps integration via Maps JavaScript SDK wrapper
+- Chat widget connected to chatbot API
+- Donor dashboard and admin dashboard pages
+- Feedback/rating component and responsive layout improvements
+
+### Deployment Docs
+
+- Staging checklist: `docs/staging-deployment.md`
+- Production checklist: `docs/production-deployment.md`
+
+### Developer Commands
+
+- Backend seed demo data:
+  - `cd backend && npm run seed`
+- Bootstrap or reset admin login:
+  - `cd backend && npm run bootstrap:admin -- --email admin@example.com --password Password123 --name "Platform Admin"`
+
+### New Database Migration
+
+- `database/migrations/002_donation_feedback.sql` adds donation feedback persistence.
 
 ## Features (Planned)
 

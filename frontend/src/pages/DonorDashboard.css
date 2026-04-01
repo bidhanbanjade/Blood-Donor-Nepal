@@ -1,0 +1,55 @@
+.donor-dashboard {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.dashboard-hero {
+  background: linear-gradient(125deg, #112f44 0%, #137f6d 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 1.2rem;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #dce6e8;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.6rem;
+  border-bottom: 1px solid #edf1f2;
+}
+
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feedback-status {
+  margin-top: 0.5rem;
+  color: #18495a;
+  font-weight: 600;
+}

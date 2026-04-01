@@ -1,11 +1,39 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import './Header.css';
 
 const Header = () => {
+  const { user, logout } = useAuth();
+
+  const getDashboardPath = () => {
+    if (!user) {
+      return null;
+    }
+
+    if (user.role === 'admin') {
+      return '/admin-dashboard';
+    }
+
+    if (user.role === 'donor') {
+      return '/donor-dashboard';
+    }
+
+    return '/';
+  };
+
+  const dashboardPath = getDashboardPath();
+
   return (
     <header className="header">
       <div className="header-top">
         <Link to="/" className="header-top-link">Home</Link>
+        {user ? (
+          <button type="button" className="header-auth-action" onClick={logout}>
+            Logout
+          </button>
+        ) : (
+          <Link to="/login" className="header-top-link">Login</Link>
+        )}
       </div>
       <nav className="header-nav">
         <div className="header-logo">
@@ -44,6 +72,15 @@ const Header = () => {
             </svg>
             Chatbot
           </Link>
+          {dashboardPath ? (
+            <Link to={dashboardPath} className="nav-link">
+              Dashboard
+            </Link>
+          ) : (
+            <Link to="/login" className="nav-link">
+              Login
+            </Link>
+          )}
         </div>
       </nav>
     </header>
@@ -51,4 +88,5 @@ const Header = () => {
 };
 
 export default Header;
+
 

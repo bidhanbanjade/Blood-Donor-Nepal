@@ -1,20 +1,32 @@
 const express = require('express');
 const router = express.Router();
 
-// Import route modules (to be created)
-// const authRoutes = require('./authRoutes');
-// const userRoutes = require('./userRoutes');
-// const bloodBankRoutes = require('./bloodBankRoutes');
+const authRoutes = require('./authRoutes');
+const donorRoutes = require('./donorRoutes');
+const hospitalRoutes = require('./hospitalRoutes');
+const inventoryRoutes = require('./inventoryRoutes');
+const donationRoutes = require('./donationRoutes');
+const bloodBankRoutes = require('./bloodBankRoutes');
+const alertRoutes = require('./alertRoutes');
+const chatbotRoutes = require('./chatbotRoutes');
+const feedbackRoutes = require('./feedbackRoutes');
 
 // Route definitions
 router.get('/', (req, res) => {
-  res.json({ message: 'Blood Donation Nepal API - Routes' });
+  res.json({ message: 'Blood Donation Nepal API' });
 });
 
 // Mount route modules
-// router.use('/auth', authRoutes);
-// router.use('/users', userRoutes);
-// router.use('/blood-banks', bloodBankRoutes);
+router.use('/auth', authRoutes);
+router.use('/donors', donorRoutes);
+router.use('/hospitals', hospitalRoutes);
+router.use('/inventory', inventoryRoutes);
+router.use('/donations', donationRoutes);
+router.use('/blood-banks', bloodBankRoutes);
+router.use('/alerts', alertRoutes);
+router.use('/chatbot', chatbotRoutes);
+router.use('/feedback', feedbackRoutes);
 
 module.exports = router;
+
 

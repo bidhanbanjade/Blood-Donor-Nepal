@@ -1,10 +1,14 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 
+const VALID_ROLES = ['donor', 'hospital', 'blood_bank', 'admin'];
+
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const bearerToken = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const cookieToken = req.cookies ? req.cookies.token : null;
+  const token = bearerToken || cookieToken;
 
   if (!token) {
     return res.status(401).json({ error: 'Access token required' });
@@ -21,12 +25,18 @@ const authenticateToken = (req, res, next) => {
 
 // Middleware to check user roles
 const authorizeRoles = (...roles) => {
+  const normalizedRoles = roles.filter((role) => VALID_ROLES.includes(role));
+
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    if (!roles.includes(req.user.role)) {
+    if (normalizedRoles.length === 0) {
+      return res.status(500).json({ error: 'No valid roles configured on route' });
+    }
+
+    if (!normalizedRoles.includes(req.user.role)) {
       return res.status(403).json({ error: 'Insufficient permissions' });
     }
 
@@ -38,4 +48,5 @@ module.exports = {
   authenticateToken,
   authorizeRoles
 };
+
 

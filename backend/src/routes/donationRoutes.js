@@ -1,0 +1,26 @@
+const express = require('express');
+const { body } = require('express-validator');
+const donationController = require('../controllers/donationController');
+const { authenticateToken, authorizeRoles } = require('../middleware/auth');
+
+const router = express.Router();
+
+router.use(authenticateToken);
+
+router.get('/', authorizeRoles('admin', 'blood_bank', 'hospital', 'donor'), donationController.listDonations);
+
+router.post(
+  '/',
+  [
+    body('donorId').isUUID(),
+    body('bloodBankId').isUUID(),
+    body('bloodType').isIn(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
+    body('donationDate').isISO8601(),
+    body('unitsDonated').optional().isInt({ min: 1 }),
+    body('notes').optional().isString(),
+  ],
+  authorizeRoles('admin', 'blood_bank', 'hospital'),
+  donationController.createDonation
+);
+
+module.exports = router;

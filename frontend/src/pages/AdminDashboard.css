@@ -1,0 +1,76 @@
+.admin-dashboard {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-hero {
+  background: linear-gradient(120deg, #3f1f43 0%, #0f5772 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 1.2rem;
+}
+
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.tile {
+  border-radius: 14px;
+  border: 1px solid #d9dde1;
+  padding: 0.8rem;
+  background: #fff;
+}
+
+.panel {
+  border-radius: 14px;
+  border: 1px solid #d6dfe4;
+  padding: 1rem;
+  background: #f9fcff;
+}
+
+.alert-form {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.alert-form select,
+.alert-form input,
+.alert-form textarea,
+.alert-form button {
+  border-radius: 10px;
+  border: 1px solid #b4c2ca;
+  padding: 0.55rem 0.7rem;
+}
+
+.alert-form button {
+  background: #0f5772;
+  color: #fff;
+  border: none;
+}
+
+.lists {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .tile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lists {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .tile-grid {
+    grid-template-columns: 1fr;
+  }
+}
