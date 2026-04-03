@@ -4,6 +4,8 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import DonorDashboard from './pages/DonorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import HospitalDashboard from './pages/HospitalDashboard';
+import BloodBankDashboard from './pages/BloodBankDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -28,6 +30,22 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hospital-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['hospital', 'admin']}>
+                  <HospitalDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/bloodbank-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['blood_bank', 'admin']}>
+                  <BloodBankDashboard />
                 </ProtectedRoute>
               }
             />
