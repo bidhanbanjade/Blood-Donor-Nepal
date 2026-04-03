@@ -8,6 +8,7 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.get('/', authorizeRoles('admin', 'blood_bank', 'hospital'), hospitalController.listHospitals);
+router.get('/me', authorizeRoles('admin', 'hospital'), hospitalController.getMyHospitalProfile);
 router.get('/:id', [param('id').isUUID()], authorizeRoles('admin', 'hospital', 'blood_bank'), hospitalController.getHospitalById);
 
 router.post(
