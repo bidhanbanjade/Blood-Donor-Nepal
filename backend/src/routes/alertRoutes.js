@@ -4,6 +4,13 @@ const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 const router = express.Router();
 
+router.get(
+  '/history',
+  authenticateToken,
+  authorizeRoles('admin', 'hospital', 'blood_bank'),
+  alertController.listAlertHistory
+);
+
 router.post(
   '/trigger',
   authenticateToken,
