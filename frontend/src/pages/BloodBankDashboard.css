@@ -58,6 +58,40 @@
   gap: 0.7rem;
 }
 
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 0.8rem;
+  color: #324e66;
+  font-size: 0.92rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.legend-swatch {
+  width: 16px;
+  height: 8px;
+  border-radius: 99px;
+  display: inline-block;
+}
+
+.legend-stock {
+  background: linear-gradient(90deg, #2f7ccf, #184f89);
+}
+
+.legend-threshold {
+  width: 2px;
+  height: 14px;
+  border-radius: 0;
+  background: #b33a3a;
+}
+
 .chart-row {
   display: grid;
   grid-template-columns: 56px 1fr 36px;
@@ -77,12 +111,72 @@
   background: #e7edf6;
   border-radius: 999px;
   overflow: hidden;
+  position: relative;
+}
+
+.chart-threshold-marker {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: #b33a3a;
+  opacity: 0.95;
+  z-index: 2;
 }
 
 .chart-bar {
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, #2f7ccf, #184f89);
+  position: relative;
+  z-index: 1;
+}
+
+.history-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.history-controls select {
+  border-radius: 10px;
+  border: 1px solid #c2c9d2;
+  padding: 0.45rem 0.6rem;
+}
+
+.history-controls p {
+  margin: 0;
+  color: #445e74;
+  font-size: 0.92rem;
+}
+
+.history-pagination {
+  margin-top: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.7rem;
+}
+
+.history-pagination button {
+  border: 1px solid #c2c9d2;
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+}
+
+.history-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.history-pagination span {
+  color: #334f66;
+  font-size: 0.92rem;
 }
 
 .low-stock-card {
