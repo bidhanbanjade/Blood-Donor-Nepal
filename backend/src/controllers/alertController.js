@@ -195,6 +195,42 @@ const triggerAlert = async (req, res, next) => {
   }
 };
 
+const listAlertHistory = async (req, res, next) => {
+  try {
+    let where = {};
+
+    if (req.user.role === 'hospital') {
+      const hospital = await Hospital.findOne({ where: { userId: req.user.id } });
+      if (!hospital) {
+        return res.status(404).json({ error: 'Hospital profile not found' });
+      }
+      where = { hospitalId: hospital.id };
+    }
+
+    if (req.user.role === 'blood_bank') {
+      const bloodBank = await BloodBank.findOne({ where: { userId: req.user.id } });
+      if (!bloodBank) {
+        return res.status(404).json({ error: 'Blood bank profile not found' });
+      }
+      where = { bloodBankId: bloodBank.id };
+    }
+
+    const alerts = await Alert.findAll({
+      where,
+      include: [
+        { model: BloodBank, as: 'bloodBank', attributes: ['id', 'name', 'city'] },
+        { model: Hospital, as: 'hospital', attributes: ['id', 'name', 'city'] },
+      ],
+      order: [['createdAt', 'DESC']],
+      limit: 50,
+    });
+
+    return res.status(200).json(alerts);
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const triggerBloodBankUrgentRequest = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -255,6 +291,7 @@ const subscribePush = async (req, res, next) => {
 module.exports = {
   triggerAlertValidators,
   triggerAlert,
+  listAlertHistory,
   triggerBloodBankUrgentRequest,
   subscribePush,
 };
