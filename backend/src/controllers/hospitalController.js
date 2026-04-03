@@ -1,6 +1,23 @@
 const { validationResult } = require('express-validator');
 const { Hospital, User } = require('../models');
 
+const getMyHospitalProfile = async (req, res, next) => {
+  try {
+    const hospital = await Hospital.findOne({
+      where: { userId: req.user.id },
+      include: [{ model: User, as: 'user' }],
+    });
+
+    if (!hospital) {
+      return res.status(404).json({ error: 'Hospital profile not found' });
+    }
+
+    return res.status(200).json(hospital);
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const listHospitals = async (req, res, next) => {
   try {
     const hospitals = await Hospital.findAll({
@@ -78,6 +95,7 @@ const deleteHospital = async (req, res, next) => {
 };
 
 module.exports = {
+  getMyHospitalProfile,
   listHospitals,
   getHospitalById,
   createHospital,
