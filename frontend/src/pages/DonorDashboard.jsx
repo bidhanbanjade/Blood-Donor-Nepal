@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
 import { feedbackService } from '../services/feedbackService';
 import FeedbackRating from '../components/FeedbackRating';
+import DashboardState from '../components/DashboardState';
 import './DonorDashboard.css';
 
 const donationCooldownDays = 56;
@@ -77,11 +78,19 @@ const DonorDashboard = () => {
   };
 
   if (status === 'loading') {
-    return <div className="donor-dashboard">Loading donor dashboard...</div>;
+    return (
+      <main className="donor-dashboard">
+        <DashboardState type="loading" message="Loading donor dashboard..." />
+      </main>
+    );
   }
 
   if (status === 'error') {
-    return <div className="donor-dashboard error">{error}</div>;
+    return (
+      <main className="donor-dashboard error">
+        <DashboardState type="error" message={error} />
+      </main>
+    );
   }
 
   return (
