@@ -4,9 +4,13 @@ import DashboardState from '../components/DashboardState';
 import './BloodBankDashboard.css';
 
 const BloodBankDashboard = () => {
+  const alertsPerPage = 8;
+  const lowStockThreshold = 5;
   const [profile, setProfile] = useState(null);
   const [inventory, setInventory] = useState([]);
   const [alertHistory, setAlertHistory] = useState([]);
+  const [alertSort, setAlertSort] = useState('newest');
+  const [alertPage, setAlertPage] = useState(1);
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState('');
@@ -47,8 +51,46 @@ const BloodBankDashboard = () => {
   }, [inventory]);
 
   const lowStockItems = useMemo(() => {
-    return inventory.filter((item) => Number(item.unitsAvailable || 0) <= 5);
+    return inventory.filter((item) => Number(item.unitsAvailable || 0) <= lowStockThreshold);
   }, [inventory]);
+
+  const thresholdPercent = useMemo(() => {
+    return Math.min(100, Math.max(0, Math.round((lowStockThreshold / maxUnits) * 100)));
+  }, [lowStockThreshold, maxUnits]);
+
+  const sortedAlertHistory = useMemo(() => {
+    const urgencyRank = { critical: 4, high: 3, medium: 2, low: 1 };
+    const sorted = [...alertHistory];
+
+    if (alertSort === 'oldest') {
+      sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      return sorted;
+    }
+
+    if (alertSort === 'urgency') {
+      sorted.sort((a, b) => (urgencyRank[b.urgency] || 0) - (urgencyRank[a.urgency] || 0));
+      return sorted;
+    }
+
+    if (alertSort === 'status') {
+      sorted.sort((a, b) => String(a.status || '').localeCompare(String(b.status || '')));
+      return sorted;
+    }
+
+    sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return sorted;
+  }, [alertHistory, alertSort]);
+
+  const totalAlertPages = Math.max(1, Math.ceil(sortedAlertHistory.length / alertsPerPage));
+
+  const pagedAlertHistory = useMemo(() => {
+    const start = (alertPage - 1) * alertsPerPage;
+    return sortedAlertHistory.slice(start, start + alertsPerPage);
+  }, [sortedAlertHistory, alertPage]);
+
+  useEffect(() => {
+    setAlertPage(1);
+  }, [alertSort, alertHistory.length]);
 
   const updateStock = async (event) => {
     event.preventDefault();
@@ -150,6 +192,14 @@ const BloodBankDashboard = () => {
 
       <section className="bloodbank-card">
         <h3>Inventory Chart</h3>
+        <div className="chart-legend">
+          <span className="legend-item">
+            <span className="legend-swatch legend-stock" /> Current stock level
+          </span>
+          <span className="legend-item">
+            <span className="legend-swatch legend-threshold" /> Low-stock threshold ({lowStockThreshold} units)
+          </span>
+        </div>
         <div className="bloodbank-chart">
           {inventory.map((item) => {
             const units = Number(item.unitsAvailable || 0);
@@ -159,6 +209,7 @@ const BloodBankDashboard = () => {
               <div className="chart-row" key={`chart-${item.id}`}>
                 <span className="chart-label">{item.bloodType}</span>
                 <div className="chart-track">
+                  <div className="chart-threshold-marker" style={{ left: `${thresholdPercent}%` }} />
                   <div className="chart-bar" style={{ width: `${width}%` }} />
                 </div>
                 <span className="chart-value">{units}</span>
@@ -171,7 +222,7 @@ const BloodBankDashboard = () => {
       <section className="bloodbank-card low-stock-card">
         <h3>Low Stock Warnings</h3>
         {lowStockItems.length === 0 ? (
-          <p>All blood types are above low-stock threshold.</p>
+          <p>All blood types are above low-stock threshold ({lowStockThreshold} units).</p>
         ) : (
           <ul className="bloodbank-list">
             {lowStockItems.map((item) => (
@@ -228,13 +279,43 @@ const BloodBankDashboard = () => {
 
       <section className="bloodbank-card">
         <h3>Alert History</h3>
+        <div className="history-controls">
+          <select value={alertSort} onChange={(event) => setAlertSort(event.target.value)}>
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="urgency">Urgency high to low</option>
+            <option value="status">Status (A-Z)</option>
+          </select>
+          <p>
+            Showing {pagedAlertHistory.length} of {sortedAlertHistory.length} alerts
+          </p>
+        </div>
         <ul className="bloodbank-list">
-          {alertHistory.map((alert) => (
+          {pagedAlertHistory.map((alert) => (
             <li key={alert.id}>
               {alert.createdAt?.slice(0, 10)} - {alert.bloodType} - {alert.urgency} - {alert.status}
             </li>
           ))}
         </ul>
+        <div className="history-pagination">
+          <button
+            type="button"
+            onClick={() => setAlertPage((prev) => Math.max(1, prev - 1))}
+            disabled={alertPage === 1}
+          >
+            Previous
+          </button>
+          <span>
+            Page {alertPage} of {totalAlertPages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setAlertPage((prev) => Math.min(totalAlertPages, prev + 1))}
+            disabled={alertPage >= totalAlertPages}
+          >
+            Next
+          </button>
+        </div>
       </section>
 
       {message ? <p className="bloodbank-message">{message}</p> : null}
