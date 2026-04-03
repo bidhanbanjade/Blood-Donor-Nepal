@@ -1,0 +1,82 @@
+.hospital-dashboard {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.hospital-hero {
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  color: #fff;
+  background: linear-gradient(120deg, #1b4965 0%, #1f6f8b 100%);
+}
+
+.hospital-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.hospital-card {
+  border: 1px solid #d2dce2;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.hospital-form {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.hospital-form select,
+.hospital-form input,
+.hospital-form textarea,
+.hospital-form button {
+  border-radius: 10px;
+  border: 1px solid #b7c6cf;
+  padding: 0.55rem 0.7rem;
+}
+
+.hospital-form button {
+  border: none;
+  color: #fff;
+  background: #1f6f8b;
+}
+
+.hospital-filters {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 0.8rem;
+}
+
+.hospital-filters select {
+  border-radius: 10px;
+  border: 1px solid #b7c6cf;
+  padding: 0.5rem 0.65rem;
+}
+
+.hospital-list {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.hospital-message {
+  color: #194c3f;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .hospital-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hospital-filters {
+    grid-template-columns: 1fr;
+  }
+}
