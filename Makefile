@@ -8,7 +8,7 @@ DB_PASSWORD := postgres123
 DB_NAME := blood_donation_nepal
 DB_USER := postgres
 
-.PHONY: help install db-up db-init bootstrap-admin seed setup backend frontend dev check
+.PHONY: help install db-up db-init bootstrap-admin seed setup backend frontend stop-ports dev check
 
 help:
 	@echo Available targets:
@@ -20,6 +20,7 @@ help:
 	@echo   make setup            - Full one-time setup (install + db + migrations + admin + seed)
 	@echo   make backend          - Run backend dev server
 	@echo   make frontend         - Run frontend dev server
+	@echo   make stop-ports       - Kill processes using ports 5000 and 5173
 	@echo   make dev              - Start backend and frontend in new terminal windows
 	@echo   make check            - Run backend tests and frontend build
 
@@ -48,10 +49,13 @@ backend:
 frontend:
 	npm --prefix $(FRONTEND_DIR) run dev
 
-dev:
+stop-ports:
+	@powershell -NoProfile -Command "$$ports = @(5000,5173); foreach ($$p in $$ports) { $$lines = netstat -ano | Select-String (\":$$p\"); foreach ($$line in $$lines) { $$parts = ($$line -replace '\\s+',' ').Trim().Split(' '); $$procId = $$parts[$$parts.Length-1]; if ($$procId -match '^[0-9]+$$' -and $$procId -ne '0') { try { Stop-Process -Id $$procId -Force -ErrorAction Stop; Write-Output (\"Stopped PID $$procId on port $$p\") } catch {} } } }"
+
+dev: stop-ports
 	@echo Starting backend and frontend in separate terminal windows...
-	@start "BIDHAN Backend" cmd /k "npm --prefix $(BACKEND_DIR) run dev"
-	@start "BIDHAN Frontend" cmd /k "npm --prefix $(FRONTEND_DIR) run dev"
+	@powershell -NoProfile -Command "Start-Process cmd -ArgumentList '/k','npm --prefix $(BACKEND_DIR) run dev'"
+	@powershell -NoProfile -Command "Start-Process cmd -ArgumentList '/k','npm --prefix $(FRONTEND_DIR) run dev'"
 
 check:
 	npm --prefix $(BACKEND_DIR) test -- --runInBand
