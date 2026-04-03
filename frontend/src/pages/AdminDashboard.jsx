@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
+import DashboardState from '../components/DashboardState';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [inventory, setInventory] = useState([]);
   const [donors, setDonors] = useState([]);
   const [hospitals, setHospitals] = useState([]);
+  const [alertHistory, setAlertHistory] = useState([]);
+  const [status, setStatus] = useState('loading');
+  const [error, setError] = useState('');
   const [alertForm, setAlertForm] = useState({
     bloodType: 'O+',
     urgency: 'high',
@@ -17,18 +21,25 @@ const AdminDashboard = () => {
   const [feedback, setFeedback] = useState('');
 
   const loadData = async () => {
-    const [invRes, donorRes, hospitalRes] = await Promise.all([
+    const [invRes, donorRes, hospitalRes, historyRes] = await Promise.all([
       api.get('/inventory'),
       api.get('/donors'),
       api.get('/hospitals'),
+      api.get('/alerts/history'),
     ]);
     setInventory(invRes.data);
     setDonors(donorRes.data);
     setHospitals(hospitalRes.data);
+    setAlertHistory(historyRes.data);
   };
 
   useEffect(() => {
-    loadData().catch(() => setFeedback('Failed to load admin data'));
+    loadData()
+      .then(() => setStatus('ready'))
+      .catch(() => {
+        setError('Failed to load admin data');
+        setStatus('error');
+      });
   }, []);
 
   const inventorySummary = useMemo(() => {
@@ -43,11 +54,29 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       const res = await api.post('/alerts/trigger', alertForm);
+      const historyRes = await api.get('/alerts/history');
+      setAlertHistory(historyRes.data);
       setFeedback(`Alert sent. Matched donors: ${res.data.matchedDonors}`);
     } catch (error) {
       setFeedback(error.response?.data?.error || 'Could not trigger alert');
     }
   };
+
+  if (status === 'loading') {
+    return (
+      <main className="admin-dashboard">
+        <DashboardState type="loading" message="Loading admin dashboard..." />
+      </main>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <main className="admin-dashboard">
+        <DashboardState type="error" message={error} />
+      </main>
+    );
+  }
 
   return (
     <main className="admin-dashboard">
@@ -114,6 +143,16 @@ const AdminDashboard = () => {
           <ul>
             {hospitals.map((hospital) => (
               <li key={hospital.id}>{hospital.name}</li>
+            ))}
+          </ul>
+        </article>
+        <article className="panel">
+          <h3>Alert History</h3>
+          <ul>
+            {alertHistory.map((alert) => (
+              <li key={alert.id}>
+                {alert.createdAt?.slice(0, 10)} - {alert.bloodType} - {alert.urgency} - {alert.status}
+              </li>
             ))}
           </ul>
         </article>
