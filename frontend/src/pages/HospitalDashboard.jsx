@@ -4,9 +4,12 @@ import DashboardState from '../components/DashboardState';
 import './HospitalDashboard.css';
 
 const HospitalDashboard = () => {
+  const alertsPerPage = 8;
   const [profile, setProfile] = useState(null);
   const [donors, setDonors] = useState([]);
   const [alertHistory, setAlertHistory] = useState([]);
+  const [alertSort, setAlertSort] = useState('newest');
+  const [alertPage, setAlertPage] = useState(1);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [alertForm, setAlertForm] = useState({
@@ -69,6 +72,40 @@ const HospitalDashboard = () => {
       return true;
     });
   }, [donors, donorFilters]);
+
+  const sortedAlertHistory = useMemo(() => {
+    const urgencyRank = { critical: 4, high: 3, medium: 2, low: 1 };
+    const sorted = [...alertHistory];
+
+    if (alertSort === 'oldest') {
+      sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      return sorted;
+    }
+
+    if (alertSort === 'urgency') {
+      sorted.sort((a, b) => (urgencyRank[b.urgency] || 0) - (urgencyRank[a.urgency] || 0));
+      return sorted;
+    }
+
+    if (alertSort === 'status') {
+      sorted.sort((a, b) => String(a.status || '').localeCompare(String(b.status || '')));
+      return sorted;
+    }
+
+    sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return sorted;
+  }, [alertHistory, alertSort]);
+
+  const totalAlertPages = Math.max(1, Math.ceil(sortedAlertHistory.length / alertsPerPage));
+
+  const pagedAlertHistory = useMemo(() => {
+    const start = (alertPage - 1) * alertsPerPage;
+    return sortedAlertHistory.slice(start, start + alertsPerPage);
+  }, [sortedAlertHistory, alertPage]);
+
+  useEffect(() => {
+    setAlertPage(1);
+  }, [alertSort, alertHistory.length]);
 
   const triggerAlert = async (event) => {
     event.preventDefault();
@@ -216,13 +253,43 @@ const HospitalDashboard = () => {
 
       <section className="hospital-card">
         <h3>Alert History</h3>
+        <div className="history-controls">
+          <select value={alertSort} onChange={(event) => setAlertSort(event.target.value)}>
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="urgency">Urgency high to low</option>
+            <option value="status">Status (A-Z)</option>
+          </select>
+          <p>
+            Showing {pagedAlertHistory.length} of {sortedAlertHistory.length} alerts
+          </p>
+        </div>
         <ul className="hospital-list">
-          {alertHistory.map((alert) => (
+          {pagedAlertHistory.map((alert) => (
             <li key={alert.id}>
               {alert.createdAt?.slice(0, 10)} - {alert.bloodType} - {alert.urgency} - {alert.status}
             </li>
           ))}
         </ul>
+        <div className="history-pagination">
+          <button
+            type="button"
+            onClick={() => setAlertPage((prev) => Math.max(1, prev - 1))}
+            disabled={alertPage === 1}
+          >
+            Previous
+          </button>
+          <span>
+            Page {alertPage} of {totalAlertPages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setAlertPage((prev) => Math.min(totalAlertPages, prev + 1))}
+            disabled={alertPage >= totalAlertPages}
+          >
+            Next
+          </button>
+        </div>
       </section>
 
       {message ? <p className="hospital-message">{message}</p> : null}
