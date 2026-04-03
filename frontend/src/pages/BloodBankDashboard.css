@@ -1,0 +1,105 @@
+.bloodbank-dashboard {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.bloodbank-hero {
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  color: #fff;
+  background: linear-gradient(120deg, #5b2c6f 0%, #7d3c98 100%);
+}
+
+.bloodbank-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.bloodbank-card {
+  border: 1px solid #d5dbe2;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.bloodbank-form {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.bloodbank-form select,
+.bloodbank-form input,
+.bloodbank-form textarea,
+.bloodbank-form button {
+  border-radius: 10px;
+  border: 1px solid #c2c9d2;
+  padding: 0.55rem 0.7rem;
+}
+
+.bloodbank-form button {
+  border: none;
+  color: #fff;
+  background: #6c3483;
+}
+
+.bloodbank-list {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.bloodbank-chart {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 36px;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.chart-label,
+.chart-value {
+  font-weight: 600;
+  color: #2d4560;
+}
+
+.chart-track {
+  width: 100%;
+  height: 0.8rem;
+  background: #e7edf6;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.chart-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2f7ccf, #184f89);
+}
+
+.low-stock-card {
+  border-left: 4px solid #b33a3a;
+}
+
+.bloodbank-message {
+  color: #3f2a7a;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .bloodbank-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-row {
+    grid-template-columns: 50px 1fr 30px;
+  }
+}
