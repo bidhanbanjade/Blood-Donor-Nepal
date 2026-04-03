@@ -2,6 +2,23 @@ const { Op } = require('sequelize');
 const { BloodBank, Inventory } = require('../models');
 const { haversineDistanceKm } = require('../utils/geo');
 
+const getMyBloodBankProfile = async (req, res, next) => {
+  try {
+    const bloodBank = await BloodBank.findOne({
+      where: { userId: req.user.id },
+      include: [{ model: Inventory, as: 'inventory' }],
+    });
+
+    if (!bloodBank) {
+      return res.status(404).json({ error: 'Blood bank profile not found' });
+    }
+
+    return res.status(200).json(bloodBank);
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const searchNearbyBloodBanks = async (req, res, next) => {
   try {
     const lat = Number(req.query.lat);
@@ -45,5 +62,6 @@ const searchNearbyBloodBanks = async (req, res, next) => {
 };
 
 module.exports = {
+  getMyBloodBankProfile,
   searchNearbyBloodBanks,
 };
