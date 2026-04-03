@@ -18,6 +18,14 @@ const Header = () => {
       return '/donor-dashboard';
     }
 
+    if (user.role === 'hospital') {
+      return '/hospital-dashboard';
+    }
+
+    if (user.role === 'blood_bank') {
+      return '/bloodbank-dashboard';
+    }
+
     return '/';
   };
 
