@@ -1,0 +1,23 @@
+.dashboard-state {
+  border-radius: 14px;
+  border: 1px solid #d6dde3;
+  padding: 1rem;
+  background: #f8fbfe;
+  color: #1f2f3f;
+}
+
+.dashboard-state.loading {
+  background: #f4f8ff;
+  border-color: #c9d8ea;
+}
+
+.dashboard-state.error {
+  background: #fff3f2;
+  border-color: #f2c1bd;
+  color: #8f2d25;
+}
+
+.dashboard-state p {
+  margin: 0;
+  font-weight: 600;
+}
