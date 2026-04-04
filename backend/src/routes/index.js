@@ -24,6 +24,7 @@ router.use('/inventory', inventoryRoutes);
 router.use('/donations', donationRoutes);
 router.use('/blood-banks', bloodBankRoutes);
 router.use('/alerts', alertRoutes);
+router.use('/alert', alertRoutes);
 router.use('/chatbot', chatbotRoutes);
 router.use('/feedback', feedbackRoutes);
 
