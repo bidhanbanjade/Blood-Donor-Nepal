@@ -1,9 +1,21 @@
 const express = require('express');
-const { body, param } = require('express-validator');
+const { body, param, query } = require('express-validator');
 const donorController = require('../controllers/donorController');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 const router = express.Router();
+
+router.get(
+  '/search/nearby',
+  [
+    query('lat').isFloat({ min: -90, max: 90 }),
+    query('lng').isFloat({ min: -180, max: 180 }),
+    query('radius').optional().isFloat({ min: 1, max: 300 }),
+    query('bloodType').optional().isIn(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
+    query('eligible').optional().isIn(['true', 'false']),
+  ],
+  donorController.searchNearbyDonors
+);
 
 router.use(authenticateToken);
 
