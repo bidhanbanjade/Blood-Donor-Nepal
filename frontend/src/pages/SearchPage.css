@@ -1,0 +1,138 @@
+.search-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f5f9fc 0%, #ffffff 38%);
+}
+
+.search-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.2rem 2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.search-hero {
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  color: #fff;
+  background: linear-gradient(120deg, #1f4f78 0%, #2f7ca6 100%);
+}
+
+.search-layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 360px minmax(0, 1fr);
+}
+
+.search-card {
+  border: 1px solid #d5e0ea;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.coming-soon-card p {
+  margin: 0.4rem 0;
+  color: #36566d;
+}
+
+.search-form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.search-form label {
+  display: grid;
+  gap: 0.35rem;
+  color: #244760;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.search-form input,
+.search-form select,
+.search-form button {
+  border: 1px solid #becbd7;
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+}
+
+.search-form button {
+  background: #1f4f78;
+  color: #fff;
+  border: none;
+}
+
+.eligible-toggle {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.btn-light {
+  background: #f0f5fa !important;
+  color: #254860 !important;
+  border: 1px solid #becbd7 !important;
+}
+
+.search-error {
+  color: #a12525;
+  font-weight: 600;
+}
+
+.donor-results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.donor-results li {
+  border: 1px solid #d8e1e9;
+  border-radius: 12px;
+  padding: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.donor-results p {
+  margin: 0.3rem 0 0;
+  color: #456172;
+}
+
+.donor-contact-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.contact-btn {
+  text-decoration: none;
+  border-radius: 9px;
+  padding: 0.35rem 0.65rem;
+  background: #1f4f78;
+  color: #fff;
+  font-weight: 600;
+}
+
+.contact-btn.secondary {
+  background: #2f7ca6;
+}
+
+@media (max-width: 900px) {
+  .search-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .donor-results li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
