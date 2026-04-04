@@ -31,9 +31,11 @@
   background: #fff;
 }
 
-.coming-soon-card p {
-  margin: 0.4rem 0;
-  color: #36566d;
+.leaflet-map {
+  height: 420px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #d5e0ea;
 }
 
 .search-form {
