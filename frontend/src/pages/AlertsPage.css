@@ -1,0 +1,60 @@
+.alerts-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fdf6f6 0%, #ffffff 45%);
+}
+
+.alerts-content {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 1rem 1.2rem 2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.alerts-hero {
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  color: #fff;
+  background: linear-gradient(120deg, #902b2b 0%, #b33a3a 100%);
+}
+
+.alerts-card {
+  border: 1px solid #efd5d5;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.alerts-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.alerts-list li {
+  border: 1px solid #f1d8d8;
+  border-radius: 12px;
+  padding: 0.8rem;
+  background: #fff9f9;
+}
+
+.alerts-list h3 {
+  margin: 0 0 0.35rem;
+  color: #7f1f1f;
+}
+
+.alerts-list p {
+  margin: 0 0 0.4rem;
+  color: #3a3a3a;
+}
+
+.alerts-list small {
+  color: #6e6e6e;
+}
+
+.alerts-error {
+  color: #9d1d1d;
+  font-weight: 600;
+}
