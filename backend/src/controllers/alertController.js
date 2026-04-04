@@ -1,4 +1,5 @@
 const { body, validationResult } = require('express-validator');
+const { Op } = require('sequelize');
 const {
   Alert,
   BloodBank,
@@ -195,6 +196,28 @@ const triggerAlert = async (req, res, next) => {
   }
 };
 
+const listPublicAlerts = async (req, res, next) => {
+  try {
+    const alerts = await Alert.findAll({
+      where: {
+        status: {
+          [Op.in]: ['active', 'sent'],
+        },
+      },
+      include: [
+        { model: BloodBank, as: 'bloodBank', attributes: ['id', 'name', 'city'] },
+        { model: Hospital, as: 'hospital', attributes: ['id', 'name', 'city'] },
+      ],
+      order: [['createdAt', 'DESC']],
+      limit: 50,
+    });
+
+    return res.status(200).json(alerts);
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const listAlertHistory = async (req, res, next) => {
   try {
     let where = {};
@@ -291,6 +314,7 @@ const subscribePush = async (req, res, next) => {
 module.exports = {
   triggerAlertValidators,
   triggerAlert,
+  listPublicAlerts,
   listAlertHistory,
   triggerBloodBankUrgentRequest,
   subscribePush,
