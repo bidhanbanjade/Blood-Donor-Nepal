@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Header from '../components/Header';
+import LeafletDonorMap from '../components/LeafletDonorMap';
 import api from '../services/api';
 import './SearchPage.css';
 
@@ -14,6 +15,9 @@ const SearchPage = () => {
     eligible: true,
   });
   const [donors, setDonors] = useState([]);
+  const [searchCenter, setSearchCenter] = useState(defaultCenter);
+  const [searchRadiusKm, setSearchRadiusKm] = useState(10);
+  const [userLocation, setUserLocation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -36,6 +40,8 @@ const SearchPage = () => {
 
       const response = await api.get(`/donors/search/nearby?${params.toString()}`);
       setDonors(response.data.results || []);
+      setSearchCenter({ lat: Number(filters.lat), lng: Number(filters.lng) });
+      setSearchRadiusKm(Number(filters.radius));
     } catch (searchError) {
       setDonors([]);
       setError(searchError.response?.data?.error || 'Could not fetch donors for this area.');
@@ -52,11 +58,17 @@ const SearchPage = () => {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const lat = Number(position.coords.latitude.toFixed(6));
+        const lng = Number(position.coords.longitude.toFixed(6));
+
         setFilters((prev) => ({
           ...prev,
-          lat: Number(position.coords.latitude.toFixed(6)),
-          lng: Number(position.coords.longitude.toFixed(6)),
+          lat,
+          lng,
         }));
+
+        setUserLocation({ lat, lng });
+        setSearchCenter({ lat, lng });
       },
       () => setError('Could not detect your current location.')
     );
@@ -142,10 +154,14 @@ const SearchPage = () => {
             {error ? <p className="search-error">{error}</p> : null}
           </article>
 
-          <article className="search-card coming-soon-card">
+          <article className="search-card">
             <h3>Map View</h3>
-            <p>Map integration is paused for now. Donor search and direct contact are fully working.</p>
-            <p>Next step: implement Leaflet map based on your instructions.</p>
+            <LeafletDonorMap
+              donors={donors}
+              center={searchCenter}
+              radiusKm={searchRadiusKm}
+              userLocation={userLocation}
+            />
           </article>
         </section>
 
