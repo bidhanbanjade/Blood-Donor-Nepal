@@ -6,6 +6,8 @@ import DonorDashboard from './pages/DonorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import HospitalDashboard from './pages/HospitalDashboard';
 import BloodBankDashboard from './pages/BloodBankDashboard';
+import SearchPage from './pages/SearchPage';
+import AlertsPage from './pages/AlertsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -17,6 +19,9 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/alerts" element={<AlertsPage />} />
+            <Route path="/alert" element={<AlertsPage />} />
             <Route
               path="/donor-dashboard"
               element={
