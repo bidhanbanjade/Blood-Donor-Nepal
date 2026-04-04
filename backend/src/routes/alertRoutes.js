@@ -4,6 +4,8 @@ const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 const router = express.Router();
 
+router.get('/public', alertController.listPublicAlerts);
+
 router.get(
   '/history',
   authenticateToken,
