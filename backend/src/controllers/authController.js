@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const config = require('../config/config');
-const { User } = require('../models');
+const { User, Donor, sequelize } = require('../models');
 const { signUserToken, buildCookieOptions } = require('../utils/authToken');
 
 const sanitizeUser = (user) => ({
@@ -19,7 +19,7 @@ const register = async (req, res, next) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullName, email, password, role, phone } = req.body;
+    const { fullName, email, password, role, phone, bloodType } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -27,12 +27,29 @@ const register = async (req, res, next) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({
-      fullName,
-      email,
-      passwordHash,
-      role,
-      phone,
+    const user = await sequelize.transaction(async (transaction) => {
+      const createdUser = await User.create(
+        {
+          fullName,
+          email,
+          passwordHash,
+          role,
+          phone,
+        },
+        { transaction }
+      );
+
+      if (role === 'donor') {
+        await Donor.create(
+          {
+            userId: createdUser.id,
+            bloodType,
+          },
+          { transaction }
+        );
+      }
+
+      return createdUser;
     });
 
     const token = signUserToken(user);
@@ -55,9 +72,10 @@ const login = async (req, res, next) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password } = req.body;
+    const { email, phone, password } = req.body;
 
-    const user = await User.scope('withPassword').findOne({ where: { email } });
+    const whereClause = email ? { email } : { phone };
+    const user = await User.scope('withPassword').findOne({ where: whereClause });
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -65,6 +83,17 @@ const login = async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    if (user.role === 'donor') {
+      const donorProfile = await Donor.findOne({ where: { userId: user.id } });
+      if (!donorProfile) {
+        // Backfill for legacy donor accounts created before donor profile auto-creation.
+        await Donor.create({
+          userId: user.id,
+          bloodType: 'O+',
+        });
+      }
     }
 
     const token = signUserToken(user);

@@ -119,6 +119,32 @@
   gap: 0.65rem;
 }
 
+.login-methods {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.22rem;
+  border-radius: 999px;
+  border: 1px solid #c4d2df;
+  background: #f6f9fc;
+  width: fit-content;
+}
+
+.method-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  background: transparent;
+  color: #2f4f6b;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.method-btn.active {
+  background: #174d7b;
+  color: #fff;
+}
+
 .login-form label {
   color: #12385f;
   font-size: 0.84rem;

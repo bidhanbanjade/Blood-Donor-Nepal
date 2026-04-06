@@ -28,6 +28,7 @@ const RegisterPage = () => {
     email: '',
     phone: '',
     role: 'donor',
+    bloodType: 'O+',
     password: '',
     confirmPassword: '',
   });
@@ -76,6 +77,10 @@ const RegisterPage = () => {
         password: form.password,
       };
 
+      if (form.role === 'donor') {
+        payload.bloodType = form.bloodType;
+      }
+
       if (form.phone.trim()) {
         payload.phone = form.phone.trim();
       }
@@ -83,7 +88,12 @@ const RegisterPage = () => {
       const result = await register(payload);
       navigate(getRoleRedirectPath(result.user.role), { replace: true });
     } catch (submitError) {
-      setError(submitError.response?.data?.error || 'Registration failed. Please try again.');
+      const apiError = submitError.response?.data;
+      if (Array.isArray(apiError?.errors) && apiError.errors.length > 0) {
+        setError(apiError.errors[0].msg || 'Registration failed. Please check your input.');
+      } else {
+        setError(apiError?.error || 'Registration failed. Please try again.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -137,6 +147,21 @@ const RegisterPage = () => {
                 </select>
               </label>
             </div>
+
+            {form.role === 'donor' ? (
+              <div className="register-grid two-col">
+                <label htmlFor="bloodType">
+                  Blood Type
+                  <select id="bloodType" name="bloodType" value={form.bloodType} onChange={handleChange}>
+                    {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            ) : null}
 
             <div className="register-grid two-col">
               <label htmlFor="email">

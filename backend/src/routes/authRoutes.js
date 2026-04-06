@@ -15,6 +15,16 @@ router.post(
       .isIn(['donor', 'receiver', 'admin'])
       .withMessage('Role must be donor, receiver, or admin'),
     body('phone').optional().isString(),
+    body('bloodType')
+      .optional({ values: 'falsy' })
+      .isIn(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
+      .withMessage('Blood type must be one of A+, A-, B+, B-, AB+, AB-, O+, O-'),
+    body().custom((_, { req }) => {
+      if (req.body.role === 'donor' && !req.body.bloodType) {
+        throw new Error('Blood type is required for donor registration');
+      }
+      return true;
+    }),
   ],
   authController.register
 );
@@ -22,7 +32,14 @@ router.post(
 router.post(
   '/login',
   [
-    body('email').isEmail().withMessage('Valid email is required'),
+    body('email').optional({ values: 'falsy' }).isEmail().withMessage('Valid email is required'),
+    body('phone').optional({ values: 'falsy' }).isString().withMessage('Valid phone is required'),
+    body().custom((_, { req }) => {
+      if (!req.body.email && !req.body.phone) {
+        throw new Error('Email or phone is required');
+      }
+      return true;
+    }),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   ],
   authController.login

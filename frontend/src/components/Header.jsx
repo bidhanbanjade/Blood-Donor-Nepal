@@ -1,9 +1,10 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import logoMark from '../assets/bdn-logo.svg';
 import './Header.css';
 
 const Header = () => {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const getDashboardPath = () => {
@@ -27,6 +28,11 @@ const Header = () => {
   };
 
   const dashboardPath = getDashboardPath();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <header className="header">
@@ -65,9 +71,14 @@ const Header = () => {
             Chatbot
           </NavLink>
           {dashboardPath ? (
-            <Link to={dashboardPath} className="nav-link">
-              Dashboard
-            </Link>
+            <>
+              <Link to={dashboardPath} className="nav-link">
+                Dashboard
+              </Link>
+              <button type="button" className="nav-link nav-logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
           ) : (
             <Link to="/login" className="nav-link">
               Login

@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const { Op } = require('sequelize');
-const { Donor, User } = require('../models');
+const { sequelize, Donor, User } = require('../models');
 const { haversineDistanceKm } = require('../utils/geo');
 
 const searchNearbyDonors = async (req, res, next) => {
@@ -138,13 +138,29 @@ const updateDonor = async (req, res, next) => {
 
 const deleteDonor = async (req, res, next) => {
   try {
-    const donor = await Donor.findByPk(req.params.id);
+    const donor = await Donor.findByPk(req.params.id, {
+      include: [{ model: User, as: 'user' }],
+    });
+
     if (!donor) {
       return res.status(404).json({ error: 'Donor not found' });
     }
 
-    await donor.destroy();
-    return res.status(204).send();
+    await sequelize.transaction(async (transaction) => {
+      const userId = donor.userId;
+      await donor.destroy({ transaction });
+
+      if (userId) {
+        await User.destroy({ where: { id: userId }, transaction });
+      }
+    });
+
+    return res.status(200).json({
+      message: 'Donor removed successfully',
+      donorId: donor.id,
+      userId: donor.userId,
+      deletedUserEmail: donor.user?.email || null,
+    });
   } catch (error) {
     return next(error);
   }

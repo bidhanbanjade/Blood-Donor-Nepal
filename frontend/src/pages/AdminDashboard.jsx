@@ -27,6 +27,11 @@ const AdminDashboard = () => {
   });
   const [feedback, setFeedback] = useState('');
 
+  const refreshDonors = async () => {
+    const donorRes = await api.get('/donors');
+    setDonors(donorRes.data);
+  };
+
   const loadData = async () => {
     const [invRes, donorRes, hospitalRes, historyRes] = await Promise.all([
       api.get('/inventory'),
@@ -100,6 +105,23 @@ const AdminDashboard = () => {
       setFeedback(`Alert sent. Matched donors: ${res.data.matchedDonors}`);
     } catch (error) {
       setFeedback(error.response?.data?.error || 'Could not trigger alert');
+    }
+  };
+
+  const handleDeleteDonor = async (donor) => {
+    const donorName = donor.user?.fullName || 'this donor';
+    const confirmed = window.confirm(`Remove ${donorName} permanently?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await api.delete(`/donors/${donor.id}`);
+      await refreshDonors();
+      setFeedback(`Removed donor: ${donorName}`);
+    } catch (error) {
+      setFeedback(error.response?.data?.error || 'Could not remove donor');
     }
   };
 
@@ -183,9 +205,17 @@ const AdminDashboard = () => {
       <section className="lists">
         <article className="panel">
           <h3>Donors</h3>
-          <ul>
+          <ul className="admin-donor-list">
             {donors.map((donor) => (
-              <li key={donor.id}>{donor.user?.fullName || donor.id}</li>
+              <li key={donor.id} className="admin-donor-row">
+                <div>
+                  <strong>{donor.user?.fullName || donor.id}</strong>
+                  <p>{donor.user?.email || 'No email'} | {donor.bloodType}</p>
+                </div>
+                <button type="button" className="admin-delete-btn" onClick={() => handleDeleteDonor(donor)}>
+                  Remove
+                </button>
+              </li>
             ))}
           </ul>
         </article>

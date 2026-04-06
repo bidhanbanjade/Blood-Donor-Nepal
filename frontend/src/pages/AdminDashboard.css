@@ -137,6 +137,46 @@
   font-size: 0.92rem;
 }
 
+.admin-donor-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.admin-donor-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border: 1px solid #dde6ec;
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  background: #fff;
+}
+
+.admin-donor-row p {
+  margin: 0.15rem 0 0;
+  color: #526876;
+  font-size: 0.88rem;
+}
+
+.admin-delete-btn {
+  border: 1px solid #f3b9b9;
+  background: #fff5f5;
+  color: #b42318;
+  border-radius: 8px;
+  padding: 0.36rem 0.65rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-delete-btn:hover {
+  background: #ffe3e3;
+}
+
 @media (max-width: 900px) {
   .tile-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -155,5 +195,10 @@
 
   .tile-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-donor-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
