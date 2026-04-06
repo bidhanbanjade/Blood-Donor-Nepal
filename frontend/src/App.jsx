@@ -8,6 +8,7 @@ import HospitalDashboard from './pages/HospitalDashboard';
 import BloodBankDashboard from './pages/BloodBankDashboard';
 import SearchPage from './pages/SearchPage';
 import AlertsPage from './pages/AlertsPage';
+import ChatbotPage from './pages/ChatbotPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -22,6 +23,7 @@ function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/alerts" element={<AlertsPage />} />
             <Route path="/alert" element={<AlertsPage />} />
+            <Route path="/chatbot" element={<ChatbotPage />} />
             <Route
               path="/donor-dashboard"
               element={
