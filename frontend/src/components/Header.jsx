@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import logoMark from '../assets/bdn-logo.svg';
 import './Header.css';
 
 const Header = () => {
@@ -36,10 +37,7 @@ const Header = () => {
       <nav className="header-nav">
         <div className="header-logo">
           <div className="logo-icon">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 4C12.5 4 9.5 7 9.5 10.5C9.5 13 11 15 13 17.5C14.5 19.5 16 22 16 24.5C16 22 17.5 19.5 19 17.5C21 15 22.5 13 22.5 10.5C22.5 7 19.5 4 16 4Z" fill="#DC2626"/>
-              <path d="M16 8C18.5 8 20.5 10 20.5 12.5C20.5 14 19.5 15.5 18 17C17 18 16 19.5 16 21C16 19.5 15 18 14 17C12.5 15.5 11.5 14 11.5 12.5C11.5 10 13.5 8 16 8Z" fill="white"/>
-            </svg>
+            <img src={logoMark} alt="Blood Donor Nepal logo" className="brand-logo" />
           </div>
           <span className="logo-text">Blood Donor Nepal</span>
         </div>
