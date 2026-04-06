@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import OTPInput from '../components/OTPInput';
+import api from '../services/api';
 import './RegisterPage.css';
 
 const getRoleRedirectPath = (role) => {
@@ -36,12 +38,66 @@ const RegisterPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [sendingOTP, setSendingOTP] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
       navigate(getRoleRedirectPath(user.role), { replace: true });
     }
   }, [loading, user, navigate]);
+
+  co
+
+  const handleRequestOTP = async () => {
+    if (!form.email) {
+      setError('Email is required to verify.');
+  if (otpSent) {
+    return (
+      <main className="register-page">
+        <OTPInput
+          email={form.email}
+          purpose="signup"
+          onVerified={handleOTPVerified}
+          onCancel={() => {
+            setOtpSent(false);
+            setError('');
+          }}
+          onResend={handleResendOTP}
+        />
+      </main>
+    );
+  }
+
+      return;
+    }
+
+    setSendingOTP(true);
+    setError('');
+
+    try {
+      await api.post('/otp/send', {
+        email: form.email.trim(),
+        purpose: 'signup',
+      });
+      setOtpSent(true);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to send OTP');
+    } finally {
+      setSendingOTP(false);
+    }
+  };
+
+  const handleOTPVerified = () => {
+    setOtpSent(false);
+    setEmailVerified(true);
+    setError('');
+  };
+
+  const handleResendOTP = async () => {
+    return handleRequestOTP();
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
