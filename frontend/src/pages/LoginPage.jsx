@@ -12,8 +12,12 @@ const getRoleRedirectPath = (role) => {
     return '/donor-dashboard';
   }
 
-  if (role === 'receiver') {
-    return '/search';
+  if (role === 'hospital') {
+    return '/hospital-dashboard';
+  }
+
+  if (role === 'blood_bank') {
+    return '/bloodbank-dashboard';
   }
 
   return '/';
@@ -22,8 +26,7 @@ const getRoleRedirectPath = (role) => {
 const LoginPage = () => {
   const navigate = useNavigate();
   const { user, login, loading } = useAuth();
-  const [loginMethod, setLoginMethod] = useState('email');
-  const [identifier, setIdentifier] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -38,8 +41,8 @@ const LoginPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!identifier || !password) {
-      setError('Login identifier and password are required.');
+    if (!email || !password) {
+      setError('Email and password are required.');
       return;
     }
 
@@ -47,12 +50,7 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const payload =
-        loginMethod === 'email'
-          ? { email: identifier.trim(), password }
-          : { phone: identifier.trim(), password };
-
-      const result = await login(payload);
+      const result = await login({ email, password });
       navigate(getRoleRedirectPath(result.user.role), { replace: true });
     } catch (submitError) {
       setError(submitError.response?.data?.error || 'Login failed. Please verify credentials.');
@@ -87,37 +85,14 @@ const LoginPage = () => {
           <p className="login-subtitle">Use your account credentials to continue.</p>
 
           <form onSubmit={handleSubmit} className="login-form">
-            <div className="login-methods" role="group" aria-label="Choose login method">
-              <button
-                type="button"
-                className={loginMethod === 'email' ? 'method-btn active' : 'method-btn'}
-                onClick={() => {
-                  setLoginMethod('email');
-                  setIdentifier('');
-                }}
-              >
-                Email
-              </button>
-              <button
-                type="button"
-                className={loginMethod === 'phone' ? 'method-btn active' : 'method-btn'}
-                onClick={() => {
-                  setLoginMethod('phone');
-                  setIdentifier('');
-                }}
-              >
-                Phone
-              </button>
-            </div>
-
-            <label htmlFor="identifier">{loginMethod === 'email' ? 'Email' : 'Phone Number'}</label>
+            <label htmlFor="email">Email</label>
             <input
-              id="identifier"
-              type={loginMethod === 'email' ? 'email' : 'tel'}
-              value={identifier}
-              onChange={(event) => setIdentifier(event.target.value)}
-              placeholder={loginMethod === 'email' ? 'admin@example.com' : '+977...'}
-              autoComplete={loginMethod === 'email' ? 'email' : 'tel'}
+              id="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="admin@example.com"
+              autoComplete="email"
             />
 
             <label htmlFor="password">Password</label>
@@ -151,12 +126,9 @@ const LoginPage = () => {
             <p className="login-hints-title">Quick test users</p>
             <p>Admin: admin@example.com</p>
             <p>Donor: donor@example.com</p>
-            <p>Receiver: receiver@example.com</p>
+            <p>Hospital: hospital@example.com</p>
+            <p>Blood bank: bloodbank@example.com</p>
           </div>
-
-          <p className="login-register-link">
-            New here? <Link to="/register">Create an account</Link>
-          </p>
         </section>
       </section>
     </main>
