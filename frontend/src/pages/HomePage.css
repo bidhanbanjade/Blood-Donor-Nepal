@@ -2,23 +2,105 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background:
+    radial-gradient(circle at 8% 18%, rgba(191, 232, 255, 0.38), transparent 38%),
+    radial-gradient(circle at 90% 30%, rgba(255, 201, 187, 0.34), transparent 46%),
+    linear-gradient(180deg, #f7fbff 0%, #ffffff 44%, #f8fafc 100%);
 }
 
 .home-enhancements {
-  width: min(1100px, 92%);
-  margin: 2rem auto;
+  width: min(1180px, 92%);
+  margin: 2.2rem auto 3.2rem;
   display: grid;
-  gap: 1rem;
-  grid-template-columns: 1.35fr 1fr;
+  gap: 1.3rem;
+  grid-template-columns: 1.5fr 1fr;
 }
 
 .home-enhancements h2 {
-  margin: 0 0 0.7rem;
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.45rem, 2.6vw, 2rem);
+  color: #0b2545;
+}
+
+.home-enhancements > div,
+.home-enhancements > .chat-widget {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(14, 39, 74, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 20px 45px rgba(10, 22, 40, 0.08);
+  backdrop-filter: blur(4px);
+}
+
+.home-enhancements > div {
+  padding: 1.25rem;
+}
+
+.home-enhancements > .chat-widget {
+  margin-top: 0;
+  padding: 1.2rem;
+}
+
+.home-page > section,
+.home-page > footer {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: section-fade-up 680ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.home-page > section:nth-of-type(1) {
+  animation-delay: 0.08s;
+}
+
+.home-page > section:nth-of-type(2) {
+  animation-delay: 0.16s;
+}
+
+.home-page > section:nth-of-type(3) {
+  animation-delay: 0.24s;
+}
+
+.home-page > section:nth-of-type(4) {
+  animation-delay: 0.3s;
+}
+
+.home-page > section:nth-of-type(5) {
+  animation-delay: 0.38s;
+}
+
+.home-page > footer {
+  animation-delay: 0.45s;
+}
+
+@keyframes section-fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 900px) {
   .home-enhancements {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.8rem;
+  }
+
+  .home-enhancements > div,
+  .home-enhancements > .chat-widget {
+    border-radius: 16px;
+  }
+
+  .home-enhancements > div {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page > section,
+  .home-page > footer {
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
 }
 
