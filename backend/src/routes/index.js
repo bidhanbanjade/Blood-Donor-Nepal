@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const authRoutes = require('./authRoutes');
+const otpRoutes = require('./otpRoutes');
 const donorRoutes = require('./donorRoutes');
 const hospitalRoutes = require('./hospitalRoutes');
 const inventoryRoutes = require('./inventoryRoutes');
@@ -18,6 +19,7 @@ router.get('/', (req, res) => {
 
 // Mount route modules
 router.use('/auth', authRoutes);
+router.use('/otp', otpRoutes);
 router.use('/donors', donorRoutes);
 router.use('/hospitals', hospitalRoutes);
 router.use('/inventory', inventoryRoutes);

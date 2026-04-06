@@ -22,6 +22,9 @@ build/
 .DS_Store
 Thumbs.db
 
+# Local recordings
+Screen Recording*.mov
+
 # PDF files (proposal documents)
 *.pdf
 

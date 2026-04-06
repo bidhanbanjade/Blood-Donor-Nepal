@@ -9,6 +9,7 @@ const Donation = require('./Donation')(sequelize);
 const DonationFeedback = require('./DonationFeedback')(sequelize);
 const Alert = require('./Alert')(sequelize);
 const PushSubscription = require('./PushSubscription')(sequelize);
+const OTP = require('./OTP')(sequelize);
 
 User.hasOne(BloodBank, { foreignKey: 'userId', as: 'bloodBank' });
 BloodBank.belongsTo(User, { foreignKey: 'userId', as: 'user' });
@@ -54,4 +55,5 @@ module.exports = {
   DonationFeedback,
   Alert,
   PushSubscription,
+  OTP,
 };

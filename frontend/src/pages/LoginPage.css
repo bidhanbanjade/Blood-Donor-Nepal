@@ -263,3 +263,35 @@
     padding: 1rem;
   }
 }
+
+.otp-option-banner {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  padding: 0.7rem;
+  margin: 0.5rem 0 1rem;
+  text-align: center;
+}
+
+.otp-option-banner p {
+  margin: 0;
+  color: #0c4a6e;
+  font-size: 0.9rem;
+}
+
+.otp-toggle-link {
+  background: transparent;
+  border: none;
+  color: #0c5aa6;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  margin: 0 0.3rem;
+}
+
+.otp-toggle-link:hover {
+  color: #0369a1;
+}
+

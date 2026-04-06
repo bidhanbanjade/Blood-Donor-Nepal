@@ -1,0 +1,159 @@
+.otp-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 1rem;
+}
+
+.otp-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e0e7ff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.otp-card h3 {
+  color: #174663;
+  margin: 0 0 0.5rem;
+  font-size: 1.4rem;
+}
+
+.otp-card p {
+  color: #666;
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+}
+
+.otp-code-input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 2rem;
+  letter-spacing: 0.5rem;
+  text-align: center;
+  border: 2px solid #dde6ec;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #174663;
+  margin-bottom: 1rem;
+  font-family: 'Courier New', monospace;
+}
+
+.otp-code-input:focus {
+  outline: none;
+  border-color: #DC2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.otp-code-input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.otp-error {
+  color: #b42318;
+  background: #fff5f5;
+  padding: 0.6rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.otp-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.otp-verify-btn,
+.otp-cancel-btn {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.otp-verify-btn {
+  background: #DC2626;
+  color: #fff;
+}
+
+.otp-verify-btn:hover:not(:disabled) {
+  background: #b91c1c;
+  transform: translateY(-2px);
+}
+
+.otp-verify-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.otp-cancel-btn {
+  background: #f0f4f8;
+  color: #666;
+  border: 1px solid #dde6ec;
+}
+
+.otp-cancel-btn:hover:not(:disabled) {
+  background: #e8ecf1;
+}
+
+.otp-resend {
+  padding-top: 1rem;
+  border-top: 1px solid #e0e7ff;
+}
+
+.otp-resend p {
+  margin: 0 0 0.5rem;
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.otp-resend span {
+  display: inline-block;
+  color: #666;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.otp-resend-btn {
+  background: transparent;
+  border: none;
+  color: #DC2626;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.otp-resend-btn:hover:not(:disabled) {
+  color: #b91c1c;
+}
+
+.otp-resend-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .otp-card {
+    padding: 1.5rem;
+  }
+
+  .otp-code-input {
+    font-size: 1.5rem;
+    letter-spacing: 0.3rem;
+  }
+
+  .otp-actions {
+    flex-direction: column;
+  }
+}
