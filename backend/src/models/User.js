@@ -31,7 +31,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(30),
       },
       role: {
-        type: DataTypes.ENUM('donor', 'hospital', 'blood_bank', 'admin'),
+        type: DataTypes.ENUM('donor', 'receiver', 'admin'),
         allowNull: false,
       },
       isActive: {

@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import DashboardState from '../components/DashboardState';
+import { useAuth } from '../hooks/useAuth';
 import './BloodBankDashboard.css';
 
 const BloodBankDashboard = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const alertsPerPage = 8;
   const lowStockThreshold = 5;
   const [profile, setProfile] = useState(null);
@@ -119,6 +123,11 @@ const BloodBankDashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
   if (status === 'loading') {
     return (
       <main className="bloodbank-dashboard">
@@ -138,7 +147,12 @@ const BloodBankDashboard = () => {
   return (
     <main className="bloodbank-dashboard">
       <header className="bloodbank-hero">
-        <h1>Blood Bank Dashboard</h1>
+        <div className="bloodbank-hero-top">
+          <h1>Blood Bank Dashboard</h1>
+          <button type="button" className="bloodbank-logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
         <p>Manage inventory and publish urgent requests to nearby eligible donors.</p>
       </header>
 

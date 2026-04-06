@@ -202,7 +202,7 @@ The frontend will be available at `http://localhost:5173`
 - Location-based blood bank directory with real-time availability
 - Emergency alert system with multi-channel notifications
 - AI-powered chatbot (A2A SDK integration)
-- User dashboard for donors, hospitals, and blood banks
+- User dashboard for donors, receiver, and admin
 - Donation history tracking
 - Blood inventory management
 - Feedback and rating system

@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { feedbackService } from '../services/feedbackService';
 import FeedbackRating from '../components/FeedbackRating';
 import DashboardState from '../components/DashboardState';
+import { useAuth } from '../hooks/useAuth';
 import './DonorDashboard.css';
 
 const donationCooldownDays = 56;
 
 const DonorDashboard = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [profile, setProfile] = useState(null);
   const [donorProfile, setDonorProfile] = useState(null);
   const [donations, setDonations] = useState([]);
@@ -77,6 +81,11 @@ const DonorDashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
   if (status === 'loading') {
     return (
       <main className="donor-dashboard">
@@ -96,7 +105,12 @@ const DonorDashboard = () => {
   return (
     <main className="donor-dashboard">
       <header className="dashboard-hero">
-        <h1>Donor Dashboard</h1>
+        <div className="dashboard-hero-top">
+          <h1>Donor Dashboard</h1>
+          <button type="button" className="dashboard-logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
         <p>Track your donations and stay ready for emergencies.</p>
       </header>
 

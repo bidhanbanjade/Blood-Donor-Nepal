@@ -12,8 +12,8 @@ router.post(
     body('email').isEmail().withMessage('Valid email is required'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
     body('role')
-      .isIn(['donor', 'hospital', 'blood_bank', 'admin'])
-      .withMessage('Role must be donor, hospital, blood_bank, or admin'),
+      .isIn(['donor', 'receiver', 'admin'])
+      .withMessage('Role must be donor, receiver, or admin'),
     body('phone').optional().isString(),
   ],
   authController.register

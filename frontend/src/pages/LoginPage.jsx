@@ -12,12 +12,8 @@ const getRoleRedirectPath = (role) => {
     return '/donor-dashboard';
   }
 
-  if (role === 'hospital') {
-    return '/hospital-dashboard';
-  }
-
-  if (role === 'blood_bank') {
-    return '/bloodbank-dashboard';
+  if (role === 'receiver') {
+    return '/search';
   }
 
   return '/';
@@ -126,9 +122,12 @@ const LoginPage = () => {
             <p className="login-hints-title">Quick test users</p>
             <p>Admin: admin@example.com</p>
             <p>Donor: donor@example.com</p>
-            <p>Hospital: hospital@example.com</p>
-            <p>Blood bank: bloodbank@example.com</p>
+            <p>Receiver: receiver@example.com</p>
           </div>
+
+          <p className="login-register-link">
+            New here? <Link to="/register">Create an account</Link>
+          </p>
         </section>
       </section>
     </main>

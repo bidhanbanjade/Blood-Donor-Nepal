@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import DashboardState from '../components/DashboardState';
+import { useAuth } from '../hooks/useAuth';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const alertsPerPage = 8;
   const [inventory, setInventory] = useState([]);
   const [donors, setDonors] = useState([]);
@@ -99,6 +103,11 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
   if (status === 'loading') {
     return (
       <main className="admin-dashboard">
@@ -118,7 +127,12 @@ const AdminDashboard = () => {
   return (
     <main className="admin-dashboard">
       <header className="admin-hero">
-        <h1>Admin Dashboard</h1>
+        <div className="admin-hero-top">
+          <h1>Admin Dashboard</h1>
+          <button type="button" className="admin-logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
         <p>Monitor inventory and trigger urgent alerts.</p>
       </header>
 

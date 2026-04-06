@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import DashboardState from '../components/DashboardState';
+import { useAuth } from '../hooks/useAuth';
 import './HospitalDashboard.css';
 
 const HospitalDashboard = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const alertsPerPage = 8;
   const [profile, setProfile] = useState(null);
   const [donors, setDonors] = useState([]);
@@ -128,6 +132,11 @@ const HospitalDashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
   if (status === 'loading') {
     return (
       <main className="hospital-dashboard">
@@ -147,7 +156,12 @@ const HospitalDashboard = () => {
   return (
     <main className="hospital-dashboard">
       <header className="hospital-hero">
-        <h1>Hospital Dashboard</h1>
+        <div className="hospital-hero-top">
+          <h1>Hospital Dashboard</h1>
+          <button type="button" className="hospital-logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
         <p>Coordinate urgent blood requests and review donor availability.</p>
       </header>
 

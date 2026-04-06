@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 
-const VALID_ROLES = ['donor', 'hospital', 'blood_bank', 'admin'];
+const VALID_ROLES = ['donor', 'receiver', 'admin'];
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
