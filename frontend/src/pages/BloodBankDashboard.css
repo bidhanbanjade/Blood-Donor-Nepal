@@ -20,6 +20,13 @@
   gap: 0.8rem;
 }
 
+.bloodbank-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
 .bloodbank-hero h1 {
   margin: 0;
 }
@@ -42,6 +49,21 @@
 .bloodbank-logout-btn:hover {
   background: #fff;
   color: #5b2c6f;
+}
+
+.bloodbank-home-btn {
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  padding: 0.42rem 0.9rem;
+  background: transparent;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.bloodbank-home-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .bloodbank-grid {

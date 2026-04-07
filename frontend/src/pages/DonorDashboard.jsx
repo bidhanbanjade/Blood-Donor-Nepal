@@ -86,6 +86,10 @@ const DonorDashboard = () => {
     navigate('/login', { replace: true });
   };
 
+  const handleHome = () => {
+    navigate('/');
+  };
+
   if (status === 'loading') {
     return (
       <main className="donor-dashboard">
@@ -107,9 +111,14 @@ const DonorDashboard = () => {
       <header className="dashboard-hero">
         <div className="dashboard-hero-top">
           <h1>Donor Dashboard</h1>
-          <button type="button" className="dashboard-logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <div className="dashboard-hero-actions">
+            <button type="button" className="dashboard-home-btn" onClick={handleHome}>
+              Back to Home
+            </button>
+            <button type="button" className="dashboard-logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
         <p>Track your donations and stay ready for emergencies.</p>
       </header>

@@ -14,10 +14,6 @@ const getRoleRedirectPath = (role) => {
     return '/donor-dashboard';
   }
 
-  if (role === 'receiver') {
-    return '/search';
-  }
-
   return '/';
 };
 
@@ -29,7 +25,6 @@ const RegisterPage = () => {
     fullName: '',
     email: '',
     phone: '',
-    role: 'donor',
     bloodType: 'O+',
     password: '',
     confirmPassword: '',
@@ -48,28 +43,9 @@ const RegisterPage = () => {
     }
   }, [loading, user, navigate]);
 
-  co
-
   const handleRequestOTP = async () => {
     if (!form.email) {
       setError('Email is required to verify.');
-  if (otpSent) {
-    return (
-      <main className="register-page">
-        <OTPInput
-          email={form.email}
-          purpose="signup"
-          onVerified={handleOTPVerified}
-          onCancel={() => {
-            setOtpSent(false);
-            setError('');
-          }}
-          onResend={handleResendOTP}
-        />
-      </main>
-    );
-  }
-
       return;
     }
 
@@ -102,13 +78,39 @@ const RegisterPage = () => {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'email') {
+      setEmailVerified(false);
+    }
   };
+
+  if (otpSent) {
+    return (
+      <main className="register-page">
+        <OTPInput
+          email={form.email}
+          purpose="signup"
+          onVerified={handleOTPVerified}
+          onCancel={() => {
+            setOtpSent(false);
+            setError('');
+          }}
+          onResend={handleResendOTP}
+        />
+      </main>
+    );
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!form.fullName || !form.email || !form.role || !form.password) {
-      setError('Full name, email, role, and password are required.');
+    if (!form.fullName || !form.email || !form.password) {
+      setError('Full name, email, and password are required.');
+      return;
+    }
+
+    if (!emailVerified) {
+      setError('Please verify your email with OTP before creating your account.');
       return;
     }
 
@@ -129,13 +131,11 @@ const RegisterPage = () => {
       const payload = {
         fullName: form.fullName.trim(),
         email: form.email.trim(),
-        role: form.role,
+        role: 'donor',
         password: form.password,
       };
 
-      if (form.role === 'donor') {
-        payload.bloodType = form.bloodType;
-      }
+      payload.bloodType = form.bloodType;
 
       if (form.phone.trim()) {
         payload.phone = form.phone.trim();
@@ -162,13 +162,12 @@ const RegisterPage = () => {
           <div className="register-showcase-mark">Create Account</div>
           <h2>Join the network that saves lives every day.</h2>
           <p>
-            Register as a donor or receiver to access life-saving tools for search, alerts, and
-            emergency response.
+            Register as a donor to access life-saving tools for alerts and emergency response.
           </p>
           <ul>
             <li>Fast account setup</li>
-            <li>Instant role-based dashboard access</li>
-            <li>Search, alerts, and chatbot support</li>
+            <li>Instant donor dashboard access</li>
+            <li>Alerts and chatbot support</li>
           </ul>
           <div className="register-showcase-links">
             <Link to="/">Back to Home</Link>
@@ -195,42 +194,45 @@ const RegisterPage = () => {
                 />
               </label>
 
-              <label htmlFor="role">
-                Role
-                <select id="role" name="role" value={form.role} onChange={handleChange}>
-                  <option value="donor">Donor</option>
-                  <option value="receiver">Receiver</option>
+              <label htmlFor="bloodType">
+                Blood Type
+                <select id="bloodType" name="bloodType" value={form.bloodType} onChange={handleChange}>
+                  {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
 
-            {form.role === 'donor' ? (
-              <div className="register-grid two-col">
-                <label htmlFor="bloodType">
-                  Blood Type
-                  <select id="bloodType" name="bloodType" value={form.bloodType} onChange={handleChange}>
-                    {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            ) : null}
-
             <div className="register-grid two-col">
               <label htmlFor="email">
                 Email
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="name@example.com"
-                  autoComplete="email"
-                />
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="name@example.com"
+                    autoComplete="email"
+                    disabled={emailVerified}
+                  />
+                  {!emailVerified ? (
+                    <button
+                      type="button"
+                      className="email-verify-btn"
+                      onClick={handleRequestOTP}
+                      disabled={sendingOTP || !form.email || submitting}
+                    >
+                      {sendingOTP ? 'Sending...' : 'Verify'}
+                    </button>
+                  ) : (
+                    <span className="email-verified-badge">Verified</span>
+                  )}
+                </div>
               </label>
 
               <label htmlFor="phone">

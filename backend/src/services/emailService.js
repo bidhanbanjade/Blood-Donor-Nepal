@@ -6,26 +6,22 @@ let transporter;
 const initializeEmailService = () => {
   if (transporter) return transporter;
 
-  // Use test account in development or real SMTP in production
-  const isProduction = process.env.NODE_ENV === 'production';
-  const smtpConfig = isProduction
-    ? {
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: process.env.SMTP_PORT || 587,
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      }
-    : {
-        host: 'smtp.mailtrap.io',
-        port: 2525,
-        auth: {
-          user: process.env.SMTP_USER || 'user',
-          pass: process.env.SMTP_PASS || 'pass',
-        },
-      };
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+
+  if (!smtpUser || !smtpPass) {
+    throw new Error('SMTP credentials are not configured');
+  }
+
+  const smtpConfig = {
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+  };
 
   transporter = nodemailer.createTransport(smtpConfig);
   return transporter;

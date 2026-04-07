@@ -14,6 +14,7 @@ const sendOTP = async (req, res, next) => {
     }
 
     const { email, purpose } = req.body;
+    const normalizedEmail = String(email || '').trim().toLowerCase();
 
     // Generate OTP code
     const code = generateOTP();
@@ -24,7 +25,7 @@ const sendOTP = async (req, res, next) => {
       { isUsed: true },
       {
         where: {
-          email,
+          email: normalizedEmail,
           purpose,
           isUsed: false,
         },
@@ -33,14 +34,14 @@ const sendOTP = async (req, res, next) => {
 
     // Create new OTP record
     const otp = await OTP.create({
-      email,
+      email: normalizedEmail,
       code,
       purpose,
       expiresAt,
     });
 
     // Send email
-    const emailResult = await sendOTPEmail(email, code);
+    const emailResult = await sendOTPEmail(normalizedEmail, code);
 
     if (!emailResult.success) {
       await otp.destroy();
@@ -48,7 +49,7 @@ const sendOTP = async (req, res, next) => {
     }
 
     return res.status(200).json({
-      message: `OTP sent to ${email}`,
+      message: `OTP sent to ${normalizedEmail}`,
       otpId: otp.id,
       expiresIn: 600, // 10 minutes in seconds
     });
@@ -65,10 +66,11 @@ const verifyOTP = async (req, res, next) => {
     }
 
     const { email, code, purpose } = req.body;
+    const normalizedEmail = String(email || '').trim().toLowerCase();
 
     const otp = await OTP.findOne({
       where: {
-        email,
+        email: normalizedEmail,
         code,
         purpose,
         isUsed: false,

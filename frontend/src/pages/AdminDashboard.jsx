@@ -130,6 +130,10 @@ const AdminDashboard = () => {
     navigate('/login', { replace: true });
   };
 
+  const handleHome = () => {
+    navigate('/');
+  };
+
   if (status === 'loading') {
     return (
       <main className="admin-dashboard">
@@ -151,9 +155,14 @@ const AdminDashboard = () => {
       <header className="admin-hero">
         <div className="admin-hero-top">
           <h1>Admin Dashboard</h1>
-          <button type="button" className="admin-logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <div className="admin-hero-actions">
+            <button type="button" className="admin-home-btn" onClick={handleHome}>
+              Back to Home
+            </button>
+            <button type="button" className="admin-logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
         <p>Monitor inventory and trigger urgent alerts.</p>
       </header>

@@ -137,6 +137,10 @@ const HospitalDashboard = () => {
     navigate('/login', { replace: true });
   };
 
+  const handleHome = () => {
+    navigate('/');
+  };
+
   if (status === 'loading') {
     return (
       <main className="hospital-dashboard">
@@ -158,9 +162,14 @@ const HospitalDashboard = () => {
       <header className="hospital-hero">
         <div className="hospital-hero-top">
           <h1>Hospital Dashboard</h1>
-          <button type="button" className="hospital-logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <div className="hospital-hero-actions">
+            <button type="button" className="hospital-home-btn" onClick={handleHome}>
+              Back to Home
+            </button>
+            <button type="button" className="hospital-logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
         <p>Coordinate urgent blood requests and review donor availability.</p>
       </header>

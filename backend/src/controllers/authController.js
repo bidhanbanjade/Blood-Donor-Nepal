@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
+const { Op } = require('sequelize');
 const { validationResult } = require('express-validator');
 const config = require('../config/config');
-const { User, Donor, sequelize } = require('../models');
+const { User, Donor, OTP, sequelize } = require('../models');
 const { signUserToken, buildCookieOptions } = require('../utils/authToken');
 
 const sanitizeUser = (user) => ({
@@ -20,8 +21,26 @@ const register = async (req, res, next) => {
     }
 
     const { fullName, email, password, role, phone, bloodType } = req.body;
+    const normalizedEmail = String(email || '').trim().toLowerCase();
 
-    const existingUser = await User.findOne({ where: { email } });
+    const verifiedWindowStart = new Date(Date.now() - 15 * 60 * 1000);
+    const verifiedSignupOtp = await OTP.findOne({
+      where: {
+        email: normalizedEmail,
+        purpose: 'signup',
+        isUsed: true,
+        updatedAt: {
+          [Op.gte]: verifiedWindowStart,
+        },
+      },
+      order: [['updatedAt', 'DESC']],
+    });
+
+    if (!verifiedSignupOtp) {
+      return res.status(400).json({ error: 'Email verification required. Please verify OTP first.' });
+    }
+
+    const existingUser = await User.findOne({ where: { email: normalizedEmail } });
     if (existingUser) {
       return res.status(409).json({ error: 'Email already in use' });
     }
@@ -31,7 +50,7 @@ const register = async (req, res, next) => {
       const createdUser = await User.create(
         {
           fullName,
-          email,
+          email: normalizedEmail,
           passwordHash,
           role,
           phone,

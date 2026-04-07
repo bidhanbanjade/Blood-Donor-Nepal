@@ -128,6 +128,10 @@ const BloodBankDashboard = () => {
     navigate('/login', { replace: true });
   };
 
+  const handleHome = () => {
+    navigate('/');
+  };
+
   if (status === 'loading') {
     return (
       <main className="bloodbank-dashboard">
@@ -149,9 +153,14 @@ const BloodBankDashboard = () => {
       <header className="bloodbank-hero">
         <div className="bloodbank-hero-top">
           <h1>Blood Bank Dashboard</h1>
-          <button type="button" className="bloodbank-logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <div className="bloodbank-hero-actions">
+            <button type="button" className="bloodbank-home-btn" onClick={handleHome}>
+              Back to Home
+            </button>
+            <button type="button" className="bloodbank-logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
         <p>Manage inventory and publish urgent requests to nearby eligible donors.</p>
       </header>

@@ -9,6 +9,7 @@ const inventoryRoutes = require('./inventoryRoutes');
 const donationRoutes = require('./donationRoutes');
 const bloodBankRoutes = require('./bloodBankRoutes');
 const alertRoutes = require('./alertRoutes');
+const publicRequestRoutes = require('./publicRequestRoutes');
 const chatbotRoutes = require('./chatbotRoutes');
 const feedbackRoutes = require('./feedbackRoutes');
 
@@ -27,6 +28,7 @@ router.use('/donations', donationRoutes);
 router.use('/blood-banks', bloodBankRoutes);
 router.use('/alerts', alertRoutes);
 router.use('/alert', alertRoutes);
+router.use('/public-requests', publicRequestRoutes);
 router.use('/chatbot', chatbotRoutes);
 router.use('/feedback', feedbackRoutes);
 
