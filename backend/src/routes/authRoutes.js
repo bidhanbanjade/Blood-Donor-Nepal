@@ -40,7 +40,7 @@ router.post(
       }
       return true;
     }),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('password').isLength({ min: 4 }).withMessage('Password must be at least 4 characters'),
   ],
   authController.login
 );

@@ -13,7 +13,7 @@
   margin: 2.2rem auto 3.2rem;
   display: grid;
   gap: 1.3rem;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1fr;
 }
 
 .home-enhancements h2 {

@@ -13,6 +13,8 @@ const sanitizeUser = (user) => ({
   phone: user.phone,
 });
 
+const normalizePhone = (value) => String(value || '').trim().replace(/[\s()-]/g, '');
+
 const register = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -22,6 +24,7 @@ const register = async (req, res, next) => {
 
     const { fullName, email, password, role, phone, bloodType } = req.body;
     const normalizedEmail = String(email || '').trim().toLowerCase();
+    const normalizedPhone = normalizePhone(phone);
 
     const verifiedWindowStart = new Date(Date.now() - 15 * 60 * 1000);
     const verifiedSignupOtp = await OTP.findOne({
@@ -53,7 +56,7 @@ const register = async (req, res, next) => {
           email: normalizedEmail,
           passwordHash,
           role,
-          phone,
+          phone: normalizedPhone || null,
         },
         { transaction }
       );

@@ -20,10 +20,6 @@ const Header = () => {
       return '/donor-dashboard';
     }
 
-    if (user.role === 'receiver') {
-      return '/search';
-    }
-
     return '/';
   };
 

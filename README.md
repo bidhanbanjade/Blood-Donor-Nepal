@@ -191,7 +191,7 @@ The frontend will be available at `http://localhost:5173`
 - Backend seed demo data:
   - `cd backend && npm run seed`
 - Bootstrap or reset admin login:
-  - `cd backend && npm run bootstrap:admin -- --email admin@example.com --password Password123 --name "Platform Admin"`
+  - `cd backend && npm run bootstrap:admin -- --email admin@gmail.com --password BB23 --name "Platform Admin"`
 
 ### New Database Migration
 

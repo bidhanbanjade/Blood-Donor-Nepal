@@ -9,10 +9,6 @@ export const API_ENDPOINTS = {
     BASE: '/users',
     PROFILE: '/users/profile',
   },
-  BLOOD_BANKS: {
-    BASE: '/blood-banks',
-    SEARCH: '/blood-banks/search',
-  },
   EMERGENCY: {
     BASE: '/emergency',
     ALERTS: '/emergency/alerts',
@@ -26,8 +22,6 @@ export const API_ENDPOINTS = {
 // User roles
 export const USER_ROLES = {
   DONOR: 'donor',
-  HOSPITAL: 'hospital',
-  BLOOD_BANK_ADMIN: 'blood_bank_admin',
 };
 
 // Blood types

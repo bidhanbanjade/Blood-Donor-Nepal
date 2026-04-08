@@ -9,16 +9,23 @@ router.get('/public', alertController.listPublicAlerts);
 router.get(
   '/history',
   authenticateToken,
-  authorizeRoles('admin', 'hospital', 'blood_bank'),
+  authorizeRoles('admin'),
   alertController.listAlertHistory
 );
 
 router.post(
   '/trigger',
   authenticateToken,
-  authorizeRoles('admin', 'hospital'),
+  authorizeRoles('admin'),
   alertController.triggerAlertValidators,
   alertController.triggerAlert
+);
+
+router.delete(
+  '/:id',
+  authenticateToken,
+  authorizeRoles('admin'),
+  alertController.deleteAlert
 );
 
 router.post('/subscribe', authenticateToken, alertController.subscribePush);

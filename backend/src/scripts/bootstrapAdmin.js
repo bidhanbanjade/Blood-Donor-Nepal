@@ -26,16 +26,16 @@ const parseArgs = () => {
 
 const main = async () => {
   const args = parseArgs();
-  const email = args.email || process.env.ADMIN_EMAIL;
-  const password = args.password || process.env.ADMIN_PASSWORD;
+  const email = args.email || process.env.ADMIN_EMAIL || 'admin@gmail.com';
+  const password = args.password || process.env.ADMIN_PASSWORD || 'BB23';
   const fullName = args.fullName || process.env.ADMIN_NAME || 'Platform Admin';
 
   if (!email || !password) {
     throw new Error('Provide --email and --password (or ADMIN_EMAIL and ADMIN_PASSWORD env vars).');
   }
 
-  if (password.length < 6) {
-    throw new Error('Admin password must be at least 6 characters.');
+  if (password.length < 4) {
+    throw new Error('Admin password must be at least 4 characters.');
   }
 
   await sequelize.authenticate();

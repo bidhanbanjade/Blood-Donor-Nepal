@@ -104,7 +104,7 @@ const AlertsPage = () => {
           <span className="alerts-kicker">Public Blood Request Feed</span>
           <h1>Emergency Alerts</h1>
           <p>
-            Anyone can submit a blood request here. Donors and blood banks can view the latest public requests below.
+            Anyone can submit a blood request here. Donors and admins can view the latest public requests below.
           </p>
           <div className="alerts-meta">
             <span>Live Feed</span>
@@ -157,7 +157,7 @@ const AlertsPage = () => {
               </label>
               <label>
                 Message
-                <textarea value={requestMessage} onChange={(e) => setRequestMessage(e.target.value)} placeholder="Describe the blood need and hospital details." rows="4" />
+                <textarea value={requestMessage} onChange={(e) => setRequestMessage(e.target.value)} placeholder="Describe the blood need and request details." rows="4" />
               </label>
             </div>
 
@@ -199,7 +199,7 @@ const AlertsPage = () => {
                   </div>
                   <p>{alert.message}</p>
                   <small>
-                    Source: {alert.hospital?.name || alert.bloodBank?.name || 'Platform Admin'} |{' '}
+                    Source: Platform Admin |{' '}
                     {new Date(alert.createdAt).toLocaleString()}
                   </small>
                 </li>

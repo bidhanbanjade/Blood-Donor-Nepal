@@ -146,7 +146,6 @@ const DonorDashboard = () => {
               <tr>
                 <th>Date</th>
                 <th>Blood Type</th>
-                <th>Blood Bank</th>
                 <th>Units</th>
               </tr>
             </thead>
@@ -155,7 +154,6 @@ const DonorDashboard = () => {
                 <tr key={item.id}>
                   <td>{item.donationDate}</td>
                   <td>{item.bloodType}</td>
-                  <td>{item.bloodBank?.name || 'N/A'}</td>
                   <td>{item.unitsDonated}</td>
                 </tr>
               ))}

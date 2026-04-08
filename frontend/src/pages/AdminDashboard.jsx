@@ -11,7 +11,6 @@ const AdminDashboard = () => {
   const alertsPerPage = 8;
   const [inventory, setInventory] = useState([]);
   const [donors, setDonors] = useState([]);
-  const [hospitals, setHospitals] = useState([]);
   const [alertHistory, setAlertHistory] = useState([]);
   const [alertSort, setAlertSort] = useState('newest');
   const [alertPage, setAlertPage] = useState(1);
@@ -33,15 +32,13 @@ const AdminDashboard = () => {
   };
 
   const loadData = async () => {
-    const [invRes, donorRes, hospitalRes, historyRes] = await Promise.all([
+    const [invRes, donorRes, historyRes] = await Promise.all([
       api.get('/inventory'),
       api.get('/donors'),
-      api.get('/hospitals'),
       api.get('/alerts/history'),
     ]);
     setInventory(invRes.data);
     setDonors(donorRes.data);
-    setHospitals(hospitalRes.data);
     setAlertHistory(historyRes.data);
   };
 
@@ -122,6 +119,23 @@ const AdminDashboard = () => {
       setFeedback(`Removed donor: ${donorName}`);
     } catch (error) {
       setFeedback(error.response?.data?.error || 'Could not remove donor');
+    }
+  };
+
+  const handleDeleteAlert = async (alert) => {
+    const confirmed = window.confirm(`Delete alert ${alert.bloodType} from ${alert.createdAt?.slice(0, 10)}?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await api.delete(`/alerts/${alert.id}`);
+      const historyRes = await api.get('/alerts/history');
+      setAlertHistory(historyRes.data);
+      setFeedback('Alert removed successfully.');
+    } catch (error) {
+      setFeedback(error.response?.data?.error || 'Could not remove alert');
     }
   };
 
@@ -229,14 +243,6 @@ const AdminDashboard = () => {
           </ul>
         </article>
         <article className="panel">
-          <h3>Hospitals</h3>
-          <ul>
-            {hospitals.map((hospital) => (
-              <li key={hospital.id}>{hospital.name}</li>
-            ))}
-          </ul>
-        </article>
-        <article className="panel">
           <h3>Alert History</h3>
           <div className="history-controls">
             <select value={alertSort} onChange={(e) => setAlertSort(e.target.value)}>
@@ -251,8 +257,13 @@ const AdminDashboard = () => {
           </div>
           <ul>
             {pagedAlertHistory.map((alert) => (
-              <li key={alert.id}>
-                {alert.createdAt?.slice(0, 10)} - {alert.bloodType} - {alert.urgency} - {alert.status}
+              <li key={alert.id} className="alert-history-row">
+                <span>
+                  {alert.createdAt?.slice(0, 10)} - {alert.bloodType} - {alert.urgency} - {alert.status}
+                </span>
+                <button type="button" className="admin-delete-btn" onClick={() => handleDeleteAlert(alert)}>
+                  Remove
+                </button>
               </li>
             ))}
           </ul>

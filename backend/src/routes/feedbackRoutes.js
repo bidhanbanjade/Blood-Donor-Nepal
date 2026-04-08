@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get('/', authorizeRoles('admin', 'donor', 'hospital', 'blood_bank'), feedbackController.listFeedback);
+router.get('/', authorizeRoles('admin', 'donor'), feedbackController.listFeedback);
 router.post(
   '/',
   authorizeRoles('admin', 'donor'),

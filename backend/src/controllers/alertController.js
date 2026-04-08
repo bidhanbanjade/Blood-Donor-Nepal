@@ -22,36 +22,23 @@ const triggerAlertValidators = [
   body('radiusKm').optional().isFloat({ min: 1, max: 300 }),
   body('latitude').optional().isFloat({ min: -90, max: 90 }),
   body('longitude').optional().isFloat({ min: -180, max: 180 }),
-  body('hospitalId').optional().isUUID(),
   body('bloodBankId').optional().isUUID(),
 ];
 
 const findAlertOrigin = async (req) => {
-  const { bloodBankId, hospitalId } = req.body;
+  const { bloodBankId } = req.body;
 
   if (req.user.role === 'blood_bank') {
     const ownBloodBank = await BloodBank.findOne({ where: { userId: req.user.id } });
     return {
       bloodBankId: ownBloodBank ? ownBloodBank.id : null,
-      hospitalId: null,
       latitude: ownBloodBank ? ownBloodBank.latitude : req.body.latitude,
       longitude: ownBloodBank ? ownBloodBank.longitude : req.body.longitude,
     };
   }
 
-  if (req.user.role === 'hospital') {
-    const ownHospital = await Hospital.findOne({ where: { userId: req.user.id } });
-    return {
-      bloodBankId: bloodBankId || null,
-      hospitalId: ownHospital ? ownHospital.id : hospitalId || null,
-      latitude: ownHospital && ownHospital.latitude ? ownHospital.latitude : req.body.latitude,
-      longitude: ownHospital && ownHospital.longitude ? ownHospital.longitude : req.body.longitude,
-    };
-  }
-
   return {
     bloodBankId: bloodBankId || null,
-    hospitalId: hospitalId || null,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
   };
@@ -66,7 +53,6 @@ const executeAlertFanout = async ({
   latitude,
   longitude,
   bloodBankId,
-  hospitalId,
 }) => {
   const alert = await Alert.create({
     createdBy,
@@ -77,7 +63,6 @@ const executeAlertFanout = async ({
     latitude,
     longitude,
     bloodBankId,
-    hospitalId,
     status: 'active',
   });
 
@@ -182,7 +167,6 @@ const triggerAlert = async (req, res, next) => {
       latitude: origin.latitude,
       longitude: origin.longitude,
       bloodBankId: origin.bloodBankId,
-      hospitalId: origin.hospitalId,
     });
 
     return res.status(200).json({
@@ -222,14 +206,6 @@ const listAlertHistory = async (req, res, next) => {
   try {
     let where = {};
 
-    if (req.user.role === 'hospital') {
-      const hospital = await Hospital.findOne({ where: { userId: req.user.id } });
-      if (!hospital) {
-        return res.status(404).json({ error: 'Hospital profile not found' });
-      }
-      where = { hospitalId: hospital.id };
-    }
-
     if (req.user.role === 'blood_bank') {
       const bloodBank = await BloodBank.findOne({ where: { userId: req.user.id } });
       if (!bloodBank) {
@@ -249,6 +225,25 @@ const listAlertHistory = async (req, res, next) => {
     });
 
     return res.status(200).json(alerts);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const deleteAlert = async (req, res, next) => {
+  try {
+    const alert = await Alert.findByPk(req.params.id);
+
+    if (!alert) {
+      return res.status(404).json({ error: 'Alert not found' });
+    }
+
+    await alert.destroy();
+
+    return res.status(200).json({
+      message: 'Alert deleted successfully',
+      alertId: alert.id,
+    });
   } catch (error) {
     return next(error);
   }
@@ -316,6 +311,7 @@ module.exports = {
   triggerAlert,
   listPublicAlerts,
   listAlertHistory,
+  deleteAlert,
   triggerBloodBankUrgentRequest,
   subscribePush,
 };

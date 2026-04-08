@@ -67,7 +67,7 @@ Run these SQL files in PostgreSQL in order:
 
 From backend folder:
 
-npm run bootstrap:admin -- --email admin@example.com --password Password123 --name "Platform Admin"
+npm run bootstrap:admin -- --email admin@gmail.com --password BB23 --name "Platform Admin"
 npm run seed
 
 Seed script creates demo donor, blood bank, hospital, inventory, and donation data.
@@ -96,7 +96,7 @@ http://localhost:5173/login
 
 Use:
 
-- Admin: admin@example.com / Password123
+- Admin: admin@gmail.com / BB23
 - Donor: donor@example.com / Password123
 - Hospital: hospital@example.com / Password123
 - Blood bank: bloodbank@example.com / Password123

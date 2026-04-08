@@ -2,7 +2,7 @@
   background:
     radial-gradient(circle at 14% 14%, rgba(255, 255, 255, 0.24), transparent 35%),
     radial-gradient(circle at 86% 80%, rgba(255, 255, 255, 0.18), transparent 30%),
-    linear-gradient(140deg, #8c1d18 0%, #b3301e 42%, #d6501f 100%);
+    linear-gradient(140deg, var(--primary-strong) 0%, #ae2b1e 42%, #d95a27 100%);
   padding: 6.4rem 2rem 6rem;
   text-align: left;
   position: relative;
@@ -82,8 +82,8 @@
 
 .btn-primary {
   background: #fffdf8;
-  color: #7a1d15;
-  box-shadow: 0 12px 24px rgba(23, 10, 5, 0.2);
+  color: var(--primary-strong);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-primary:hover {
@@ -100,7 +100,7 @@
 
 .btn-secondary:hover {
   background: #fff;
-  color: #8c1d18;
+  color: var(--primary-strong);
   transform: translateY(-2px) scale(1.01);
 }
 

@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get('/', authorizeRoles('admin', 'blood_bank', 'hospital'), inventoryController.listInventory);
+router.get('/', authorizeRoles('admin'), inventoryController.listInventory);
 
 router.post(
   '/',
@@ -16,7 +16,7 @@ router.post(
     body('bloodType').isIn(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
     body('unitsAvailable').isInt({ min: 0 }),
   ],
-  authorizeRoles('admin', 'blood_bank'),
+  authorizeRoles('admin'),
   inventoryController.upsertStock
 );
 

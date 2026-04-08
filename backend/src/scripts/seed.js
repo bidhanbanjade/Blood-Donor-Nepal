@@ -5,10 +5,7 @@ const {
   sequelize,
   User,
   Donor,
-  BloodBank,
   Hospital,
-  Inventory,
-  Donation,
 } = require('../models');
 
 const createOrUpdateUser = async ({ fullName, email, role, phone, password }) => {
@@ -43,14 +40,6 @@ const main = async () => {
     password: process.env.SEED_DEFAULT_PASSWORD || 'Password123',
   });
 
-  const bloodBankUser = await createOrUpdateUser({
-    fullName: 'Demo Blood Bank',
-    email: process.env.SEED_BLOODBANK_EMAIL || 'bloodbank@example.com',
-    role: 'blood_bank',
-    phone: process.env.SEED_BLOODBANK_PHONE || '+9779800000002',
-    password: process.env.SEED_DEFAULT_PASSWORD || 'Password123',
-  });
-
   const hospitalUser = await createOrUpdateUser({
     fullName: 'Demo Hospital',
     email: process.env.SEED_HOSPITAL_EMAIL || 'hospital@example.com',
@@ -71,20 +60,6 @@ const main = async () => {
     },
   });
 
-  const [bloodBank] = await BloodBank.findOrCreate({
-    where: { userId: bloodBankUser.id },
-    defaults: {
-      userId: bloodBankUser.id,
-      name: 'Kathmandu Central Blood Bank',
-      address: 'Putalisadak, Kathmandu',
-      city: 'Kathmandu',
-      latitude: 27.7103,
-      longitude: 85.3222,
-      contactPhone: '+9779800000002',
-      isVerified: true,
-    },
-  });
-
   await Hospital.findOrCreate({
     where: { userId: hospitalUser.id },
     defaults: {
@@ -98,42 +73,9 @@ const main = async () => {
     },
   });
 
-  const stock = [
-    { bloodType: 'O+', unitsAvailable: 20 },
-    { bloodType: 'A+', unitsAvailable: 10 },
-    { bloodType: 'B+', unitsAvailable: 8 },
-    { bloodType: 'AB+', unitsAvailable: 4 },
-  ];
-
-  for (const item of stock) {
-    const [inventory] = await Inventory.findOrCreate({
-      where: { bloodBankId: bloodBank.id, bloodType: item.bloodType },
-      defaults: { unitsAvailable: item.unitsAvailable },
-    });
-
-    await inventory.update({ unitsAvailable: item.unitsAvailable });
-  }
-
-  await Donation.findOrCreate({
-    where: {
-      donorId: donor.id,
-      bloodBankId: bloodBank.id,
-      donationDate: '2026-02-01',
-    },
-    defaults: {
-      donorId: donor.id,
-      bloodBankId: bloodBank.id,
-      bloodType: donor.bloodType,
-      donationDate: '2026-02-01',
-      unitsDonated: 1,
-      notes: 'Seed donation record',
-    },
-  });
-
   console.log('Seed completed.');
   console.log(`Donor login: ${donorUser.email}`);
   console.log(`Hospital login: ${hospitalUser.email}`);
-  console.log(`Blood bank login: ${bloodBankUser.email}`);
   console.log(`Default password: ${process.env.SEED_DEFAULT_PASSWORD || 'Password123'}`);
 };
 

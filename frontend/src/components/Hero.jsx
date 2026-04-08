@@ -5,7 +5,7 @@ const Hero = () => {
   return (
     <section className="hero">
       <div className="hero-content">
-        <h1 className="hero-title">Save Lives, Donate Blood</h1>
+        <h1 className="hero-title">Donate Blood, Save Lives</h1>
         <p className="hero-subtitle">
           Connecting blood donors with those in need across Nepal.
         </p>

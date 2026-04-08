@@ -3,8 +3,8 @@ const config = require('../config/config');
 
 const AGENT_CARD = {
   name: 'Blood Donation Nepal Assistant',
-  description: 'Assistant for donation eligibility, nearest blood bank, FAQs, and emergency guidance.',
-  intents: ['eligibility_screening', 'nearest_blood_bank', 'donation_faqs', 'emergency_guidance'],
+  description: 'Assistant for donation eligibility, nearby hospitals, FAQs, and emergency guidance.',
+  intents: ['eligibility_screening', 'location_guidance', 'donation_faqs', 'emergency_guidance'],
 };
 
 const detectIntent = (message) => {
@@ -14,8 +14,8 @@ const detectIntent = (message) => {
     return 'eligibility_screening';
   }
 
-  if (/nearest|nearby|blood bank|map|location/.test(normalized)) {
-    return 'nearest_blood_bank';
+  if (/nearest|nearby|hospital|map|location/.test(normalized)) {
+    return 'location_guidance';
   }
 
   if (/emergency|urgent|critical|help now/.test(normalized)) {
@@ -29,12 +29,12 @@ const localIntentResponse = (intent) => {
   const responses = {
     eligibility_screening:
       'General eligibility: age 18-65, healthy condition, and adequate hemoglobin level. Please consult a clinician for final screening.',
-    nearest_blood_bank:
-      'Share your location (lat/lng) and I can help find nearby blood banks through the location search endpoint.',
+    location_guidance:
+      'Share your location (lat/lng) and I can help you find nearby hospitals or emergency support options.',
     donation_faqs:
       'Most donors can donate whole blood every 56 days. Stay hydrated and eat a healthy meal before donation.',
     emergency_guidance:
-      'For life-threatening emergencies, contact local emergency services first. I can also trigger a blood alert workflow for hospitals and blood banks.',
+      'For life-threatening emergencies, contact local emergency services first. I can also help you with the hospital alert workflow.',
   };
 
   return responses[intent] || responses.donation_faqs;

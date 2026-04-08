@@ -7,7 +7,7 @@ const quickPrompts = [
   'Who can donate blood?',
   'What should I do before donating?',
   'How often can I donate?',
-  'Where is the nearest blood bank?',
+  'What if I need urgent help?',
 ];
 
 const ChatbotPage = () => {
@@ -16,7 +16,7 @@ const ChatbotPage = () => {
     {
       id: 'init',
       role: 'assistant',
-      text: 'Hello! I can help with blood donation eligibility, safety guidance, and finding nearby support.',
+      text: 'Hello! I can help with blood donation eligibility, safety guidance, and emergency guidance.',
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -106,7 +106,7 @@ const ChatbotPage = () => {
                     {
                       id: 'init-reset',
                       role: 'assistant',
-                      text: 'Conversation reset. Ask me anything about blood donation.',
+                      text: 'Conversation reset. Ask me anything about blood donation or emergency guidance.',
                     },
                   ])
                 }

@@ -8,7 +8,7 @@ const ChatWidget = () => {
     {
       id: 'init',
       role: 'assistant',
-      text: 'Ask about eligibility, nearest blood bank, FAQs, or emergency guidance.',
+      text: 'Ask about eligibility, FAQs, or emergency guidance.',
     },
   ]);
   const [loading, setLoading] = useState(false);

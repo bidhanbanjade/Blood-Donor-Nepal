@@ -1,9 +1,10 @@
 .chat-widget {
-  background: linear-gradient(160deg, #fff8ec, #f4fff9);
-  border: 1px solid #e8ddc9;
+  background: linear-gradient(160deg, rgba(255, 250, 242, 0.92), rgba(244, 250, 255, 0.95));
+  border: 1px solid var(--border);
   border-radius: 18px;
   padding: 1rem;
   margin-top: 1rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .chat-widget h3 {
@@ -41,7 +42,7 @@
 }
 
 .chat-form input {
-  border: 1px solid #ccbfae;
+  border: 1px solid rgba(182, 196, 212, 0.95);
   border-radius: 12px;
   padding: 0.6rem 0.8rem;
 }
@@ -49,7 +50,7 @@
 .chat-form button {
   border: none;
   border-radius: 12px;
-  background: #224f45;
+  background: linear-gradient(140deg, #174d7d 0%, #2a6aa1 100%);
   color: #fff;
   padding: 0.6rem 1rem;
 }

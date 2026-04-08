@@ -88,7 +88,7 @@ const RegisterPage = () => {
     return (
       <main className="register-page">
         <OTPInput
-          email={form.email}
+          recipient={form.email}
           purpose="signup"
           onVerified={handleOTPVerified}
           onCancel={() => {

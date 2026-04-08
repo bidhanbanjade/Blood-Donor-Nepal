@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get('/', authorizeRoles('admin', 'blood_bank', 'hospital', 'donor'), donationController.listDonations);
+router.get('/', authorizeRoles('admin', 'donor'), donationController.listDonations);
 
 router.post(
   '/',
@@ -19,7 +19,7 @@ router.post(
     body('unitsDonated').optional().isInt({ min: 1 }),
     body('notes').optional().isString(),
   ],
-  authorizeRoles('admin', 'blood_bank', 'hospital'),
+  authorizeRoles('admin'),
   donationController.createDonation
 );
 

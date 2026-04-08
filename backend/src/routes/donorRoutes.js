@@ -19,12 +19,12 @@ router.get(
 
 router.use(authenticateToken);
 
-router.get('/', authorizeRoles('admin', 'hospital', 'blood_bank'), donorController.listDonors);
+router.get('/', authorizeRoles('admin', 'donor'), donorController.listDonors);
 router.get('/me', authorizeRoles('donor', 'admin'), donorController.getMyDonorProfile);
 router.get(
   '/:id',
   [param('id').isUUID().withMessage('Donor ID must be a UUID')],
-  authorizeRoles('admin', 'hospital', 'blood_bank', 'donor'),
+  authorizeRoles('admin', 'donor'),
   donorController.getDonorById
 );
 

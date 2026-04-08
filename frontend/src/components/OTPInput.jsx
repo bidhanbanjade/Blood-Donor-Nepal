@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './OTPInput.css';
 
-const OTPInput = ({ email, purpose, onVerified, onCancel, onResend }) => {
+const OTPInput = ({ recipient, purpose, onVerified, onCancel, onResend }) => {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,7 +20,7 @@ const OTPInput = ({ email, purpose, onVerified, onCancel, onResend }) => {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/otp/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: otp, purpose }),
+        body: JSON.stringify({ email: recipient, code: otp, purpose }),
       });
 
       const data = await response.json();
@@ -63,7 +63,7 @@ const OTPInput = ({ email, purpose, onVerified, onCancel, onResend }) => {
     <div className="otp-input-container">
       <div className="otp-card">
         <h3>Verify Your Email</h3>
-        <p>Enter the 6-digit code sent to {email}</p>
+        <p>Enter the 6-digit code sent to {recipient}</p>
 
         <input
           type="text"

@@ -144,7 +144,7 @@ const LoginPage = () => {
 
           <div className="login-hints">
             <p className="login-hints-title">Quick test users</p>
-            <p>Admin: admin@example.com</p>
+            <p>Admin: admin@gmail.com / BB23</p>
             <p>Donor: donor@example.com</p>
           </div>
 
