@@ -142,6 +142,29 @@
   color: #70849b;
 }
 
+.alert-actions {
+  margin-top: 0.7rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.donate-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 0.95rem;
+  background: linear-gradient(145deg, #0f6a3f 0%, #2b8d5d 100%);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.donate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 106, 63, 0.22);
+}
+
 .alert-badges {
   display: flex;
   gap: 0.4rem;

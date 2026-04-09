@@ -42,7 +42,27 @@ const createPublicRequest = async (req, res, next) => {
   }
 };
 
+const deletePublicRequest = async (req, res, next) => {
+  try {
+    const request = await PublicBloodRequest.findByPk(req.params.id);
+
+    if (!request) {
+      return res.status(404).json({ error: 'Public blood request not found' });
+    }
+
+    await request.destroy();
+
+    return res.status(200).json({
+      message: 'Public blood request deleted successfully',
+      requestId: request.id,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 module.exports = {
   listPublicRequests,
   createPublicRequest,
+  deletePublicRequest,
 };

@@ -1,6 +1,7 @@
 const express = require('express');
 const { body } = require('express-validator');
 const publicRequestController = require('../controllers/publicRequestController');
+const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -18,6 +19,13 @@ router.post(
     body('message').trim().isLength({ min: 10 }).withMessage('Message must be at least 10 characters'),
   ],
   publicRequestController.createPublicRequest
+);
+
+router.delete(
+  '/:id',
+  authenticateToken,
+  authorizeRoles('admin'),
+  publicRequestController.deletePublicRequest
 );
 
 module.exports = router;

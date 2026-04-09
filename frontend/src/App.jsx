@@ -33,7 +33,79 @@ function App() {
               }
             />
             <Route
+              path="/donor-dashboard/profile"
+              element={
+                <ProtectedRoute allowedRoles={['donor', 'admin']}>
+                  <DonorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/donor-dashboard/eligibility"
+              element={
+                <ProtectedRoute allowedRoles={['donor', 'admin']}>
+                  <DonorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/donor-dashboard/history"
+              element={
+                <ProtectedRoute allowedRoles={['donor', 'admin']}>
+                  <DonorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/donor-dashboard/feedback"
+              element={
+                <ProtectedRoute allowedRoles={['donor', 'admin']}>
+                  <DonorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard/inventory"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard/trigger-alert"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard/donors"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard/alert-history"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard/public-requests"
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />

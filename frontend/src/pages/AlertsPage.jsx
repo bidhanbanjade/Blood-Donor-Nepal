@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import api from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 import './AlertsPage.css';
 
 const formatUrgency = (urgency = '') => urgency.toUpperCase();
@@ -21,6 +23,9 @@ const getStatusClass = (status = '') => {
 };
 
 const AlertsPage = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isDonor = user?.role === 'donor';
   const [alerts, setAlerts] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +34,7 @@ const AlertsPage = () => {
   const [requestError, setRequestError] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
   const [requestSuccess, setRequestSuccess] = useState('');
+  const [donorActionMessage, setDonorActionMessage] = useState('');
   const [requestForm, setRequestForm] = useState({
     fullName: '',
     phone: '',
@@ -94,6 +100,22 @@ const AlertsPage = () => {
     } finally {
       setRequestLoading(false);
     }
+  };
+
+  const handleDonateAlert = () => {
+    navigate('/donor-dashboard');
+    setDonorActionMessage('Thanks for stepping up. Please continue from your donor dashboard.');
+  };
+
+  const handleDonateRequest = (request) => {
+    if (request.phone) {
+      window.location.href = `tel:${request.phone}`;
+      setDonorActionMessage('Dialing requester now. Thank you for donating.');
+      return;
+    }
+
+    navigate('/donor-dashboard');
+    setDonorActionMessage('Thanks for stepping up. Please continue from your donor dashboard.');
   };
 
   return (
@@ -176,6 +198,8 @@ const AlertsPage = () => {
             <span className="alerts-count">{alerts.length}</span>
           </div>
 
+          {isDonor && donorActionMessage ? <p className="alerts-success">{donorActionMessage}</p> : null}
+
           {loading ? <p className="alerts-muted">Loading alerts...</p> : null}
           {error ? <p className="alerts-error">{error}</p> : null}
           {!loading && !error && alerts.length === 0 ? (
@@ -202,6 +226,13 @@ const AlertsPage = () => {
                     Source: Platform Admin |{' '}
                     {new Date(alert.createdAt).toLocaleString()}
                   </small>
+                  {isDonor ? (
+                    <div className="alert-actions">
+                      <button type="button" className="donate-btn" onClick={handleDonateAlert}>
+                        Donate
+                      </button>
+                    </div>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -234,6 +265,13 @@ const AlertsPage = () => {
                 <small>
                   {request.fullName} | {request.phone} {request.city ? `| ${request.city}` : ''} | {request.unitsNeeded} unit(s)
                 </small>
+                {isDonor ? (
+                  <div className="alert-actions">
+                    <button type="button" className="donate-btn" onClick={() => handleDonateRequest(request)}>
+                      Donate
+                    </button>
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
