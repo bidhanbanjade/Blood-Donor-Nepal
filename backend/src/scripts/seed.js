@@ -43,7 +43,7 @@ const main = async () => {
   const hospitalUser = await createOrUpdateUser({
     fullName: 'Demo Hospital',
     email: process.env.SEED_HOSPITAL_EMAIL || 'hospital@example.com',
-    role: 'hospital',
+    role: 'receiver',
     phone: process.env.SEED_HOSPITAL_PHONE || '+9779800000003',
     password: process.env.SEED_DEFAULT_PASSWORD || 'Password123',
   });
