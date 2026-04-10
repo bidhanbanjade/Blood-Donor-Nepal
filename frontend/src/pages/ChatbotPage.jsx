@@ -3,20 +3,30 @@ import Header from '../components/Header';
 import api from '../services/api';
 import './ChatbotPage.css';
 
-const quickPrompts = [
+const QUICK_PROMPTS = [
+  'Is A+ blood available in Kathmandu?',
+  'Find O- donors in Pokhara',
+  'Show current urgent blood requests',
+  'Blood banks in Chitwan',
+  'B+ donors in Butwal',
   'Who can donate blood?',
-  'What should I do before donating?',
   'How often can I donate?',
-  'What if I need urgent help?',
+  'What blood types are compatible with AB+?',
 ];
 
+const TypingIndicator = () => (
+  <div className="chatbot-bubble assistant typing-bubble">
+    <span /><span /><span />
+  </div>
+);
+
 const ChatbotPage = () => {
-  const [message, setMessage] = useState('');
+  const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
     {
       id: 'init',
       role: 'assistant',
-      text: 'Hello! I can help with blood donation eligibility, safety guidance, and emergency guidance.',
+      text: "Hi! I'm your Blood Donation Assistant 🩸\n\nI can help you find donors, check blood availability, and show urgent requests across Kathmandu, Butwal, Pokhara, and Chitwan.\n\nWhat do you need?",
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -26,31 +36,35 @@ const ChatbotPage = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  const sendMessage = async (event, forcedPrompt = '') => {
-    if (event) {
-      event.preventDefault();
-    }
+  const buildHistory = (msgs) =>
+    msgs
+      .filter((m) => m.id !== 'init' && m.id !== 'init-reset')
+      .map((m) => ({ role: m.role, content: m.text }));
 
-    const input = (forcedPrompt || message).trim();
-    if (!input || loading) {
-      return;
-    }
+  const sendMessage = async (forcedText = '') => {
+    const userText = (forcedText || input).trim();
+    if (!userText || loading) return;
 
-    setMessage('');
-    setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: 'user', text: input }]);
+    setInput('');
+    const userMsg = { id: crypto.randomUUID(), role: 'user', text: userText };
+    setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
 
     try {
-      const response = await api.post('/chatbot/task', { message: input });
+      const response = await api.post('/chatbot/task', {
+        message: userText,
+        history: buildHistory(messages),
+      });
+
       setMessages((prev) => [
         ...prev,
         {
           id: crypto.randomUUID(),
           role: 'assistant',
-          text: response.data.reply || 'I could not generate a response this time.',
+          text: response.data.reply || 'I could not generate a response. Please try again.',
         },
       ]);
-    } catch (_) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
@@ -64,6 +78,21 @@ const ChatbotPage = () => {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    sendMessage();
+  };
+
+  const clearChat = () => {
+    setMessages([
+      {
+        id: 'init-reset',
+        role: 'assistant',
+        text: 'Conversation cleared. Ask me anything about blood availability or donation! 🩸',
+      },
+    ]);
+  };
+
   return (
     <main className="chatbot-page">
       <Header />
@@ -72,8 +101,7 @@ const ChatbotPage = () => {
           <span className="chatbot-kicker">AI Assistant</span>
           <h1>Chat with the Blood Donation Assistant</h1>
           <p>
-            Ask health and donation questions, get practical guidance, and receive instant support
-            before urgent situations.
+            Find donors, check blood availability across 4 cities, and get real-time urgent alerts — just ask.
           </p>
         </header>
 
@@ -82,11 +110,11 @@ const ChatbotPage = () => {
             <h2>Quick Questions</h2>
             <p>Tap a question to instantly start the conversation.</p>
             <div className="quick-prompts">
-              {quickPrompts.map((prompt) => (
+              {QUICK_PROMPTS.map((prompt) => (
                 <button
                   key={prompt}
                   type="button"
-                  onClick={() => sendMessage(null, prompt)}
+                  onClick={() => sendMessage(prompt)}
                   disabled={loading}
                 >
                   {prompt}
@@ -97,20 +125,14 @@ const ChatbotPage = () => {
 
           <section className="chatbot-chat-card">
             <div className="chatbot-chat-header">
-              <h2>Conversation</h2>
-              <button
-                type="button"
-                className="clear-chat"
-                onClick={() =>
-                  setMessages([
-                    {
-                      id: 'init-reset',
-                      role: 'assistant',
-                      text: 'Conversation reset. Ask me anything about blood donation or emergency guidance.',
-                    },
-                  ])
-                }
-              >
+              <div className="chatbot-chat-title">
+                <div className="chatbot-avatar">🩸</div>
+                <div>
+                  <h2>Blood Assistant</h2>
+                  <p className="chatbot-model">Powered by Groq · Llama 3.3</p>
+                </div>
+              </div>
+              <button type="button" className="clear-chat" onClick={clearChat}>
                 Clear Chat
               </button>
             </div>
@@ -118,22 +140,25 @@ const ChatbotPage = () => {
             <div className="chatbot-log" aria-live="polite">
               {messages.map((msg) => (
                 <div key={msg.id} className={`chatbot-bubble ${msg.role}`}>
-                  {msg.text}
+                  {msg.text.split('\n').map((line, i) => (
+                    <span key={i}>{line}<br /></span>
+                  ))}
                 </div>
               ))}
-              {loading ? <div className="chatbot-bubble assistant">Thinking...</div> : null}
+              {loading && <TypingIndicator />}
               <div ref={chatEndRef} />
             </div>
 
-            <form onSubmit={sendMessage} className="chatbot-form">
+            <form onSubmit={handleSubmit} className="chatbot-form">
               <input
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                placeholder="Ask your question here"
-                aria-label="Type your question"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask about blood availability, donors, alerts..."
+                disabled={loading}
+                autoComplete="off"
               />
-              <button type="submit" disabled={loading}>
-                {loading ? 'Sending...' : 'Send'}
+              <button type="submit" disabled={loading || !input.trim()}>
+                {loading ? '...' : 'Send'}
               </button>
             </form>
           </section>
