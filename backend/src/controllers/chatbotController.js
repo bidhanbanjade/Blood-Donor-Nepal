@@ -16,7 +16,7 @@ const runTask = async (req, res, next) => {
 
     const result = await handleTask({
       message: req.body.message,
-      context: req.body.context || {},
+      history: req.body.history || [],
     });
 
     return res.status(200).json(result);
