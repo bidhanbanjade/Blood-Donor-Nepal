@@ -1,13 +1,17 @@
 const nodemailer = require('nodemailer');
-const config = require('../config/config');
 
 let transporter;
+
+const getSmtpCredentials = () => {
+  const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+  return { smtpUser, smtpPass };
+};
 
 const initializeEmailService = () => {
   if (transporter) return transporter;
 
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
+  const { smtpUser, smtpPass } = getSmtpCredentials();
 
   if (!smtpUser || !smtpPass) {
     throw new Error('SMTP credentials are not configured');
@@ -29,6 +33,22 @@ const initializeEmailService = () => {
 
 const sendOTPEmail = async (email, otp) => {
   try {
+    const { smtpUser, smtpPass } = getSmtpCredentials();
+    const devOtpEnabled = process.env.ENABLE_DEV_OTP === 'true';
+
+    // Dev fallback is explicit opt-in only.
+    if (!smtpUser || !smtpPass) {
+      if (!devOtpEnabled) {
+        return {
+          success: false,
+          error: 'SMTP credentials are not configured. Set SMTP_USER and SMTP_PASS.',
+        };
+      }
+
+      console.log(`[DEV OTP] ${email}: ${otp}`);
+      return { success: true, mode: 'dev-fallback' };
+    }
+
     const mailer = initializeEmailService();
 
     const mailOptions = {
@@ -53,7 +73,7 @@ const sendOTPEmail = async (email, otp) => {
     };
 
     const result = await mailer.sendMail(mailOptions);
-    return { success: true, messageId: result.messageId };
+    return { success: true, mode: 'smtp', messageId: result.messageId };
   } catch (error) {
     console.error('Email send error:', error.message);
     return { success: false, error: error.message };

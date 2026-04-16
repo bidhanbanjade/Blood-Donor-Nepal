@@ -36,6 +36,7 @@ const RegisterPage = () => {
   const [emailVerified, setEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [sendingOTP, setSendingOTP] = useState(false);
+  const [devOtpHint, setDevOtpHint] = useState('');
 
   useEffect(() => {
     if (!loading && user) {
@@ -53,12 +54,15 @@ const RegisterPage = () => {
     setError('');
 
     try {
-      await api.post('/otp/send', {
+      const response = await api.post('/otp/send', {
         email: form.email.trim(),
         purpose: 'signup',
       });
+      const hint = response.data?.devOtp ? `Development OTP: ${response.data.devOtp}` : '';
+      setDevOtpHint(hint);
       setOtpSent(true);
     } catch (err) {
+      setDevOtpHint('');
       setError(err.response?.data?.error || 'Failed to send OTP');
     } finally {
       setSendingOTP(false);
@@ -68,6 +72,7 @@ const RegisterPage = () => {
   const handleOTPVerified = () => {
     setOtpSent(false);
     setEmailVerified(true);
+    setDevOtpHint('');
     setError('');
   };
 
@@ -81,6 +86,7 @@ const RegisterPage = () => {
 
     if (name === 'email') {
       setEmailVerified(false);
+      setDevOtpHint('');
     }
   };
 
@@ -90,6 +96,7 @@ const RegisterPage = () => {
         <OTPInput
           recipient={form.email}
           purpose="signup"
+          devOtpHint={devOtpHint}
           onVerified={handleOTPVerified}
           onCancel={() => {
             setOtpSent(false);

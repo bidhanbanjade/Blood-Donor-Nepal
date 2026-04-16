@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './OTPInput.css';
 
-const OTPInput = ({ recipient, purpose, onVerified, onCancel, onResend }) => {
+const OTPInput = ({ recipient, purpose, onVerified, onCancel, onResend, devOtpHint = '' }) => {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -64,6 +64,7 @@ const OTPInput = ({ recipient, purpose, onVerified, onCancel, onResend }) => {
       <div className="otp-card">
         <h3>Verify Your Email</h3>
         <p>Enter the 6-digit code sent to {recipient}</p>
+        {devOtpHint ? <p className="otp-dev-hint">{devOtpHint}</p> : null}
 
         <input
           type="text"

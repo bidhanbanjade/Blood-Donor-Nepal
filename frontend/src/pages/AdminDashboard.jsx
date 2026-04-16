@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import DashboardState from '../components/DashboardState';
 import { useAuth } from '../hooks/useAuth';
 import './AdminDashboard.css';
+
+const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
 const AdminDashboard = () => {
   const location = useLocation();
@@ -18,6 +20,7 @@ const AdminDashboard = () => {
   const [alertPage, setAlertPage] = useState(1);
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState('');
+  const [lastUpdated, setLastUpdated] = useState('');
   const [alertForm, setAlertForm] = useState({
     bloodType: 'O+',
     urgency: 'high',
@@ -55,40 +58,62 @@ const AdminDashboard = () => {
     return exact ? exact.key : 'overview';
   }, [location.pathname, navItems]);
 
-  const refreshDonors = async () => {
-    const donorRes = await api.get('/donors');
-    setDonors(donorRes.data);
-  };
-
-  const loadData = async () => {
-    const [invRes, donorRes, historyRes, publicReqRes] = await Promise.all([
-      api.get('/inventory'),
-      api.get('/donors'),
-      api.get('/alerts/history'),
-      api.get('/public-requests/public'),
-    ]);
-    setInventory(invRes.data);
-    setDonors(donorRes.data);
-    setAlertHistory(historyRes.data);
-    setPublicRequests(publicReqRes.data);
-  };
-
-  useEffect(() => {
-    loadData()
-      .then(() => setStatus('ready'))
-      .catch(() => {
+  const loadData = useCallback(async ({ silent = false } = {}) => {
+    try {
+      const [invRes, donorRes, historyRes, publicReqRes] = await Promise.all([
+        api.get('/inventory'),
+        api.get('/donors'),
+        api.get('/alerts/history'),
+        api.get('/public-requests/public'),
+      ]);
+      setInventory(invRes.data);
+      setDonors(donorRes.data);
+      setAlertHistory(historyRes.data);
+      setPublicRequests(publicReqRes.data);
+      setLastUpdated(new Date().toLocaleTimeString());
+      setError('');
+      setStatus('ready');
+    } catch (loadError) {
+      if (!silent) {
         setError('Failed to load admin data');
         setStatus('error');
-      });
+      }
+    }
   }, []);
 
-  const inventorySummary = useMemo(() => {
-    const summary = {};
-    for (const item of inventory) {
-      summary[item.bloodType] = (summary[item.bloodType] || 0) + Number(item.unitsAvailable || 0);
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      loadData({ silent: true });
+    }, 5000);
+
+    const handleVisible = () => {
+      if (document.visibilityState === 'visible') {
+        loadData({ silent: true });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisible);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisible);
+    };
+  }, [loadData]);
+
+  const donorAvailabilitySummary = useMemo(() => {
+    const summary = Object.fromEntries(BLOOD_TYPES.map((type) => [type, 0]));
+    for (const donor of donors) {
+      const bloodType = donor?.bloodType;
+      if (bloodType && Object.prototype.hasOwnProperty.call(summary, bloodType)) {
+        summary[bloodType] += 1;
+      }
     }
     return summary;
-  }, [inventory]);
+  }, [donors]);
 
   const sortedAlertHistory = useMemo(() => {
     const urgencyRank = { critical: 4, high: 3, medium: 2, low: 1 };
@@ -128,8 +153,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       const res = await api.post('/alerts/trigger', alertForm);
-      const historyRes = await api.get('/alerts/history');
-      setAlertHistory(historyRes.data);
+      await loadData({ silent: true });
       setFeedback(`Alert sent. Matched donors: ${res.data.matchedDonors}`);
     } catch (error) {
       setFeedback(error.response?.data?.error || 'Could not trigger alert');
@@ -146,7 +170,7 @@ const AdminDashboard = () => {
 
     try {
       await api.delete(`/donors/${donor.id}`);
-      await refreshDonors();
+      await loadData({ silent: true });
       setFeedback(`Removed donor: ${donorName}`);
     } catch (error) {
       setFeedback(error.response?.data?.error || 'Could not remove donor');
@@ -162,8 +186,7 @@ const AdminDashboard = () => {
 
     try {
       await api.delete(`/alerts/${alert.id}`);
-      const historyRes = await api.get('/alerts/history');
-      setAlertHistory(historyRes.data);
+      await loadData({ silent: true });
       setFeedback('Alert removed successfully.');
     } catch (error) {
       setFeedback(error.response?.data?.error || 'Could not remove alert');
@@ -182,8 +205,7 @@ const AdminDashboard = () => {
 
     try {
       await api.delete(`/public-requests/${request.id}`);
-      const publicReqRes = await api.get('/public-requests/public');
-      setPublicRequests(publicReqRes.data);
+      await loadData({ silent: true });
       setFeedback('Public blood request removed successfully.');
     } catch (error) {
       setFeedback(error.response?.data?.error || 'Could not remove public blood request');
@@ -208,6 +230,7 @@ const AdminDashboard = () => {
       <header className="admin-hero">
         <h2>Dashboard</h2>
         <p>Plan, prioritize, and coordinate response across all blood requests.</p>
+        <small>{`Live data \u2022 auto-refresh every 5s${lastUpdated ? ` \u2022 last updated ${lastUpdated}` : ''}`}</small>
       </header>
 
       <section className="stat-grid">
@@ -237,13 +260,13 @@ const AdminDashboard = () => {
 
   const renderInventory = () => (
     <section className="panel">
-      <h3>Inventory by Blood Type</h3>
+      <h3>Donors by Blood Type</h3>
       <div className="stat-grid">
-        {Object.entries(inventorySummary).map(([type, units]) => (
+        {Object.entries(donorAvailabilitySummary).map(([type, donorCount]) => (
           <article key={type} className="stat-card">
             <h3>{type}</h3>
-            <p>{units}</p>
-            <small>Units available</small>
+            <p>{donorCount}</p>
+            <small>Donors available</small>
           </article>
         ))}
       </div>

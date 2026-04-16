@@ -59,6 +59,14 @@ function App() {
               }
             />
             <Route
+              path="/donor-dashboard/alerts"
+              element={
+                <ProtectedRoute allowedRoles={['donor', 'admin']}>
+                  <DonorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/donor-dashboard/feedback"
               element={
                 <ProtectedRoute allowedRoles={['donor', 'admin']}>

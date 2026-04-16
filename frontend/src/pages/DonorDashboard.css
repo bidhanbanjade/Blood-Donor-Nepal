@@ -251,6 +251,61 @@
   margin-top: 0.6rem;
 }
 
+.donor-profile-form {
+  margin-top: 0.55rem;
+}
+
+.donor-profile-grid label {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.donor-profile-grid label span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #516678;
+}
+
+.donor-profile-grid input,
+.donor-profile-grid select {
+  border: 1px solid #d2dde8;
+  border-radius: 10px;
+  padding: 0.52rem 0.62rem;
+  color: #304b62;
+  background: #fff;
+}
+
+.donor-profile-grid input:disabled {
+  background: #f4f7fb;
+  color: #6a7f91;
+}
+
+.donor-profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.7rem;
+}
+
+.donor-profile-actions button {
+  border: 1px solid #1e40af;
+  background: #1e40af;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.48rem 0.78rem;
+  font-weight: 700;
+}
+
+.donor-profile-actions button:hover {
+  background: #1d3691;
+}
+
+.donor-profile-actions p {
+  margin: 0;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
 .donor-profile-grid p {
   margin: 0;
   color: #3f566d;
@@ -266,6 +321,52 @@
 .donor-card p {
   margin: 0.22rem 0 0;
   color: #607487;
+}
+
+.eligibility-controls {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.45rem;
+  max-width: 320px;
+}
+
+.eligibility-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #425a70;
+}
+
+.eligibility-controls select {
+  border: 1px solid #d2dde8;
+  border-radius: 10px;
+  padding: 0.52rem 0.62rem;
+  color: #304b62;
+  background: #fff;
+}
+
+.eligibility-controls button {
+  border: 1px solid #1e40af;
+  background: #1e40af;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.48rem 0.78rem;
+  font-weight: 700;
+  justify-self: start;
+}
+
+.eligibility-controls button:hover:not(:disabled) {
+  background: #1d3691;
+}
+
+.eligibility-controls button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.eligibility-status {
+  margin: 0;
+  color: #1e3a8a;
+  font-weight: 600;
 }
 
 .table-wrap {
@@ -296,6 +397,35 @@ th {
   font-weight: 600;
 }
 
+.donor-alert-urgency {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.donor-alert-urgency-low {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.donor-alert-urgency-medium {
+  background: #ecfeff;
+  color: #155e75;
+}
+
+.donor-alert-urgency-high {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.donor-alert-urgency-critical {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
 @media (max-width: 1040px) {
   .donor-shell {
     grid-template-columns: 1fr;
@@ -307,6 +437,11 @@ th {
 
   .donor-profile-grid {
     grid-template-columns: 1fr;
+  }
+
+  .donor-profile-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 

@@ -16,9 +16,20 @@ const DonorDashboard = () => {
   const [profile, setProfile] = useState(null);
   const [donorProfile, setDonorProfile] = useState(null);
   const [donations, setDonations] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [profileForm, setProfileForm] = useState({
+    fullName: '',
+    phone: '',
+    bloodType: 'O+',
+    city: '',
+  });
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState('');
   const [feedbackStatus, setFeedbackStatus] = useState('');
+  const [profileSaveStatus, setProfileSaveStatus] = useState('');
+  const [eligibilityValue, setEligibilityValue] = useState(true);
+  const [eligibilitySaving, setEligibilitySaving] = useState(false);
+  const [eligibilityStatus, setEligibilityStatus] = useState('');
 
   const donorNavItems = useMemo(
     () => [
@@ -26,6 +37,7 @@ const DonorDashboard = () => {
       { key: 'profile', label: 'Profile', path: '/donor-dashboard/profile' },
       { key: 'eligibility', label: 'Eligibility', path: '/donor-dashboard/eligibility' },
       { key: 'history', label: 'Donation History', path: '/donor-dashboard/history' },
+      { key: 'alerts', label: 'Alerts', path: '/donor-dashboard/alerts' },
       { key: 'feedback', label: 'Feedback', path: '/donor-dashboard/feedback' },
     ],
     []
@@ -45,11 +57,21 @@ const DonorDashboard = () => {
         const donorProfileRes = await api.get('/donors/me');
         const matchedDonorProfile = donorProfileRes.data;
         setDonorProfile(matchedDonorProfile || null);
+        setEligibilityValue(Boolean(matchedDonorProfile?.isEligible));
+        setProfileForm({
+          fullName: me.data?.fullName || '',
+          phone: me.data?.phone || '',
+          bloodType: matchedDonorProfile?.bloodType || 'O+',
+          city: matchedDonorProfile?.city || '',
+        });
 
         if (matchedDonorProfile) {
           const donationsRes = await api.get(`/donations?donorId=${matchedDonorProfile.id}`);
           setDonations(donationsRes.data);
         }
+
+        const alertsRes = await api.get('/alerts/public');
+        setAlerts(alertsRes.data || []);
 
         setStatus('ready');
       } catch (err) {
@@ -59,6 +81,21 @@ const DonorDashboard = () => {
     };
 
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(async () => {
+      try {
+        const alertsRes = await api.get('/alerts/public');
+        setAlerts(alertsRes.data || []);
+      } catch (_) {
+        // Keep previous alert list if a refresh call fails.
+      }
+    }, 15000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, []);
 
   const nextEligibleDate = useMemo(() => {
@@ -81,6 +118,11 @@ const DonorDashboard = () => {
   const totalUnitsDonated = useMemo(
     () => donations.reduce((sum, item) => sum + Number(item.unitsDonated || 0), 0),
     [donations]
+  );
+
+  const donorAvailabilityStatus = useMemo(
+    () => (donorProfile?.isEligible ? 'Eligible to donate' : 'Not eligible right now'),
+    [donorProfile?.isEligible]
   );
 
   const handleFeedback = async (payload) => {
@@ -106,6 +148,65 @@ const DonorDashboard = () => {
   const handleLogout = () => {
     logout();
     navigate('/login', { replace: true });
+  };
+
+  const handleProfileInputChange = (event) => {
+    const { name, value } = event.target;
+    setProfileForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleProfileSave = async (event) => {
+    event.preventDefault();
+    if (!donorProfile?.id) {
+      setProfileSaveStatus('Cannot update profile right now.');
+      return;
+    }
+
+    try {
+      setProfileSaveStatus('');
+
+      const userPayload = {
+        fullName: profileForm.fullName.trim(),
+        phone: profileForm.phone.trim(),
+      };
+
+      const donorPayload = {
+        bloodType: profileForm.bloodType,
+        city: profileForm.city.trim(),
+      };
+
+      const [userRes, donorRes] = await Promise.all([
+        api.put('/auth/me', userPayload),
+        api.put(`/donors/${donorProfile.id}`, donorPayload),
+      ]);
+
+      setProfile(userRes.data.user);
+      setDonorProfile(donorRes.data);
+      setProfileSaveStatus('Profile updated successfully.');
+    } catch (saveError) {
+      setProfileSaveStatus(saveError.response?.data?.error || 'Could not update profile.');
+    }
+  };
+
+  const handleEligibilitySave = async () => {
+    if (!donorProfile?.id) {
+      setEligibilityStatus('Cannot update eligibility right now.');
+      return;
+    }
+
+    try {
+      setEligibilitySaving(true);
+      setEligibilityStatus('');
+      const res = await api.put(`/donors/${donorProfile.id}`, {
+        isEligible: eligibilityValue,
+      });
+      setDonorProfile(res.data);
+      setEligibilityStatus('Eligibility updated successfully.');
+    } catch (saveError) {
+      setEligibilityStatus(saveError.response?.data?.error || 'Could not update eligibility.');
+    } finally {
+      setEligibilitySaving(false);
+    }
   };
 
   const handleHome = () => {
@@ -141,8 +242,8 @@ const DonorDashboard = () => {
         </article>
         <article className="donor-stat-card">
           <h3>Eligibility</h3>
-          <p>{nextEligibleDate === 'Eligible now' ? 'Ready' : 'Soon'}</p>
-          <small>Next: {nextEligibleDate}</small>
+          <p>{donorProfile?.isEligible ? 'Ready' : 'Paused'}</p>
+          <small>{`Availability: ${donorAvailabilityStatus}`}</small>
         </article>
       </section>
     </>
@@ -151,21 +252,89 @@ const DonorDashboard = () => {
   const renderProfile = () => (
     <section className="donor-card">
       <h3>My Profile</h3>
-      <div className="donor-profile-grid">
-        <p><strong>Name:</strong> {profile?.fullName || 'N/A'}</p>
-        <p><strong>Email:</strong> {profile?.email || 'N/A'}</p>
-        <p><strong>Role:</strong> {profile?.role || 'N/A'}</p>
-        <p><strong>Blood Type:</strong> {donorProfile?.bloodType || 'N/A'}</p>
-      </div>
+      <form className="donor-profile-form" onSubmit={handleProfileSave}>
+        <div className="donor-profile-grid">
+          <label>
+            <span>Full Name</span>
+            <input
+              type="text"
+              name="fullName"
+              value={profileForm.fullName}
+              onChange={handleProfileInputChange}
+              required
+            />
+          </label>
+          <label>
+            <span>Email</span>
+            <input type="email" value={profile?.email || ''} disabled />
+          </label>
+          <label>
+            <span>Phone</span>
+            <input
+              type="text"
+              name="phone"
+              value={profileForm.phone}
+              onChange={handleProfileInputChange}
+              placeholder="+977..."
+            />
+          </label>
+          <label>
+            <span>Blood Type</span>
+            <select name="bloodType" value={profileForm.bloodType} onChange={handleProfileInputChange}>
+              {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>City / Place</span>
+            <input
+              type="text"
+              name="city"
+              value={profileForm.city}
+              onChange={handleProfileInputChange}
+              placeholder="Kathmandu"
+            />
+          </label>
+          <label>
+            <span>Role</span>
+            <input type="text" value={profile?.role || 'donor'} disabled />
+          </label>
+        </div>
+        <div className="donor-profile-actions">
+          <button type="submit">Save Profile</button>
+          {profileSaveStatus ? <p>{profileSaveStatus}</p> : null}
+        </div>
+      </form>
     </section>
   );
 
   const renderEligibility = () => (
     <section className="donor-card">
       <h3>Eligibility Status</h3>
-      <p className="donor-lead-value">{nextEligibleDate}</p>
+      <p className="donor-lead-value">{donorAvailabilityStatus}</p>
       <p>Total donations logged: {donations.length}</p>
       <p>Minimum wait between donations: {donationCooldownDays} days.</p>
+      <p>Next date by donation interval: {nextEligibleDate}</p>
+      <div className="eligibility-controls">
+        <label htmlFor="donorEligibility" className="eligibility-label">
+          Donor Availability
+        </label>
+        <select
+          id="donorEligibility"
+          value={eligibilityValue ? 'eligible' : 'not-eligible'}
+          onChange={(event) => setEligibilityValue(event.target.value === 'eligible')}
+        >
+          <option value="eligible">Eligible to donate</option>
+          <option value="not-eligible">Not eligible right now</option>
+        </select>
+        <button type="button" onClick={handleEligibilitySave} disabled={eligibilitySaving}>
+          {eligibilitySaving ? 'Saving...' : 'Save Eligibility'}
+        </button>
+        {eligibilityStatus ? <p className="eligibility-status">{eligibilityStatus}</p> : null}
+      </div>
     </section>
   );
 
@@ -195,6 +364,44 @@ const DonorDashboard = () => {
     </section>
   );
 
+  const renderAlerts = () => (
+    <section className="donor-card">
+      <h3>All Alerts</h3>
+      {alerts.length === 0 ? (
+        <p>No alerts available right now.</p>
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Blood Type</th>
+                <th>Urgency</th>
+                <th>Status</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              {alerts.map((alert) => (
+                <tr key={alert.id}>
+                  <td>{alert.createdAt?.slice(0, 10) || '-'}</td>
+                  <td>{alert.bloodType}</td>
+                  <td>
+                    <span className={`donor-alert-urgency donor-alert-urgency-${alert.urgency}`}>
+                      {alert.urgency}
+                    </span>
+                  </td>
+                  <td>{alert.status}</td>
+                  <td>{alert.message}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+
   const renderFeedback = () => (
     <section className="donor-card">
       <h3>Donation Feedback</h3>
@@ -214,6 +421,10 @@ const DonorDashboard = () => {
 
     if (activeSection === 'history') {
       return renderHistory();
+    }
+
+    if (activeSection === 'alerts') {
+      return renderAlerts();
     }
 
     if (activeSection === 'feedback') {

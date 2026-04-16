@@ -144,6 +144,37 @@ const me = async (req, res, next) => {
   }
 };
 
+const updateMe = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const updates = {};
+    if (typeof req.body.fullName === 'string') {
+      updates.fullName = req.body.fullName.trim();
+    }
+    if (typeof req.body.phone === 'string') {
+      updates.phone = normalizePhone(req.body.phone) || null;
+    }
+
+    await user.update(updates);
+
+    return res.status(200).json({
+      message: 'Profile updated successfully',
+      user: sanitizeUser(user),
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const logout = (req, res) => {
   res.clearCookie(config.authCookieName, buildCookieOptions());
   return res.status(200).json({ message: 'Logout successful' });
@@ -153,5 +184,6 @@ module.exports = {
   register,
   login,
   me,
+  updateMe,
   logout,
 };

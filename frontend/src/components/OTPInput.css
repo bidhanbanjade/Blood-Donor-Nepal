@@ -43,6 +43,17 @@
   font-family: 'Courier New', monospace;
 }
 
+.otp-dev-hint {
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: #ecfdf3;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .otp-code-input:focus {
   outline: none;
   border-color: #DC2626;

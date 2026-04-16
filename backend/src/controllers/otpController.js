@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator');
-const { OTP } = require('../models');
+const { OTP, User } = require('../models');
 const { sendOTPEmail } = require('../services/emailService');
 
 const generateOTP = () => {
@@ -15,6 +15,15 @@ const sendOTP = async (req, res, next) => {
 
     const { email, purpose } = req.body;
     const normalizedEmail = String(email || '').trim().toLowerCase();
+    const existingUser = await User.findOne({ where: { email: normalizedEmail } });
+
+    if (purpose === 'signup' && existingUser) {
+      return res.status(409).json({ error: 'Email already registered. Please log in instead.' });
+    }
+
+    if (purpose !== 'signup' && !existingUser) {
+      return res.status(404).json({ error: 'No account found for this email.' });
+    }
 
     // Generate OTP code
     const code = generateOTP();
@@ -45,14 +54,21 @@ const sendOTP = async (req, res, next) => {
 
     if (!emailResult.success) {
       await otp.destroy();
-      return res.status(500).json({ error: 'Failed to send OTP email' });
+      return res.status(500).json({ error: emailResult.error || 'Failed to send OTP email' });
     }
 
-    return res.status(200).json({
+    const responseBody = {
       message: `OTP sent to ${normalizedEmail}`,
       otpId: otp.id,
       expiresIn: 600, // 10 minutes in seconds
-    });
+    };
+
+    if (emailResult.mode === 'dev-fallback') {
+      responseBody.devOtp = code;
+      responseBody.delivery = 'dev-fallback';
+    }
+
+    return res.status(200).json(responseBody);
   } catch (error) {
     return next(error);
   }

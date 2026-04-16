@@ -129,6 +129,10 @@ const updateDonor = async (req, res, next) => {
       return res.status(404).json({ error: 'Donor not found' });
     }
 
+    if (req.user.role === 'donor' && donor.userId !== req.user.id) {
+      return res.status(403).json({ error: 'You can only update your own donor profile' });
+    }
+
     await donor.update(req.body);
     return res.status(200).json(donor);
   } catch (error) {

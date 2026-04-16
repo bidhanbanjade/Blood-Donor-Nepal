@@ -46,6 +46,15 @@ router.post(
 );
 
 router.get('/me', authenticateToken, authController.me);
+router.put(
+  '/me',
+  authenticateToken,
+  [
+    body('fullName').optional().trim().notEmpty().withMessage('Full name cannot be empty'),
+    body('phone').optional().isString().withMessage('Phone must be a string'),
+  ],
+  authController.updateMe
+);
 router.post('/logout', authenticateToken, authController.logout);
 
 module.exports = router;

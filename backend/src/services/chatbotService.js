@@ -2,7 +2,19 @@ const Groq = require('groq-sdk');
 const { Op } = require('sequelize');
 const { Donor, User, BloodBank, Inventory, Alert, Hospital } = require('../models');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groq = null;
+
+// Lazy initialize Groq client
+function getGroqClient() {
+  if (!groq && process.env.GROQ_API_KEY) {
+    try {
+      groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    } catch (err) {
+      console.warn('Failed to initialize Groq client:', err.message);
+    }
+  }
+  return groq;
+}
 
 const SYSTEM_PROMPT = `You are a compassionate and helpful blood donation assistant for Blood Donor Nepal.
 You help people find blood donors, check blood availability, and learn about blood donation.
@@ -254,7 +266,15 @@ const handleTask = async ({ message, history = [] }) => {
 
   // Agentic loop — keep going until no more tool calls (max 5 iterations)
   for (let i = 0; i < 5; i++) {
-    const response = await groq.chat.completions.create({
+    const client = getGroqClient();
+    if (!client) {
+      return {
+        reply: 'Chatbot is not configured. Please set GROQ_API_KEY.',
+        source: 'error',
+      };
+    }
+    
+    const response = await client.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages,
       tools: TOOLS,
