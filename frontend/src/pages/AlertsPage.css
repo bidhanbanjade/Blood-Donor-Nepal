@@ -165,6 +165,18 @@
   box-shadow: 0 10px 20px rgba(15, 106, 63, 0.22);
 }
 
+.donated-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.5rem 0.95rem;
+  background: linear-gradient(145deg, #0f6a3f 0%, #2b8d5d 100%);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
 .alert-badges {
   display: flex;
   gap: 0.4rem;

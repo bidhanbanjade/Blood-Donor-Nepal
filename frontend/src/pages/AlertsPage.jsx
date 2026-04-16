@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import api from '../services/api';
@@ -35,6 +35,8 @@ const AlertsPage = () => {
   const [requestMessage, setRequestMessage] = useState('');
   const [requestSuccess, setRequestSuccess] = useState('');
   const [donorActionMessage, setDonorActionMessage] = useState('');
+  const [donatedAlertIds, setDonatedAlertIds] = useState({});
+  const [donatedRequestIds, setDonatedRequestIds] = useState({});
   const [requestForm, setRequestForm] = useState({
     fullName: '',
     phone: '',
@@ -43,6 +45,7 @@ const AlertsPage = () => {
     unitsNeeded: 1,
     city: '',
   });
+  const removalTimersRef = useRef([]);
 
   useEffect(() => {
     const loadAlerts = async () => {
@@ -61,6 +64,11 @@ const AlertsPage = () => {
     };
 
     loadAlerts();
+  }, []);
+
+  useEffect(() => () => {
+    removalTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
+    removalTimersRef.current = [];
   }, []);
 
   const handleRequestChange = (event) => {
@@ -102,20 +110,50 @@ const AlertsPage = () => {
     }
   };
 
-  const handleDonateAlert = () => {
-    navigate('/donor-dashboard');
-    setDonorActionMessage('Thanks for stepping up. Please continue from your donor dashboard.');
+  const scheduleRemoval = (type, id) => {
+    const timerId = window.setTimeout(() => {
+      if (type === 'alert') {
+        setAlerts((prev) => prev.filter((item) => item.id !== id));
+        setDonatedAlertIds((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      } else {
+        setRequests((prev) => prev.filter((item) => item.id !== id));
+        setDonatedRequestIds((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      }
+    }, 90000);
+
+    removalTimersRef.current.push(timerId);
   };
 
-  const handleDonateRequest = (request) => {
-    if (request.phone) {
-      window.location.href = `tel:${request.phone}`;
-      setDonorActionMessage('Dialing requester now. Thank you for donating.');
-      return;
-    }
+  const handleDonateAlert = async (alert) => {
+    try {
+      await api.post('/donations/self');
 
-    navigate('/donor-dashboard');
-    setDonorActionMessage('Thanks for stepping up. Please continue from your donor dashboard.');
+      setDonatedAlertIds((prev) => ({ ...prev, [alert.id]: true }));
+      setDonorActionMessage('Donated. This alert will disappear shortly.');
+      scheduleRemoval('alert', alert.id);
+    } catch (donateError) {
+      setDonorActionMessage(donateError.response?.data?.error || 'Could not record donation right now.');
+    }
+  };
+
+  const handleDonateRequest = async (request) => {
+    try {
+      await api.post('/donations/self');
+
+      setDonatedRequestIds((prev) => ({ ...prev, [request.id]: true }));
+      setDonorActionMessage('Donated. This request will disappear shortly.');
+      scheduleRemoval('request', request.id);
+    } catch (donateError) {
+      setDonorActionMessage(donateError.response?.data?.error || 'Could not record donation right now.');
+    }
   };
 
   return (
@@ -228,9 +266,13 @@ const AlertsPage = () => {
                   </small>
                   {isDonor ? (
                     <div className="alert-actions">
-                      <button type="button" className="donate-btn" onClick={handleDonateAlert}>
-                        Donate
-                      </button>
+                      {donatedAlertIds[alert.id] ? (
+                        <span className="donated-pill">Donated</span>
+                      ) : (
+                        <button type="button" className="donate-btn" onClick={() => handleDonateAlert(alert)}>
+                          Donate
+                        </button>
+                      )}
                     </div>
                   ) : null}
                 </li>
@@ -267,9 +309,13 @@ const AlertsPage = () => {
                 </small>
                 {isDonor ? (
                   <div className="alert-actions">
-                    <button type="button" className="donate-btn" onClick={() => handleDonateRequest(request)}>
-                      Donate
-                    </button>
+                    {donatedRequestIds[request.id] ? (
+                      <span className="donated-pill">Donated</span>
+                    ) : (
+                      <button type="button" className="donate-btn" onClick={() => handleDonateRequest(request)}>
+                        Donate
+                      </button>
+                    )}
                   </div>
                 ) : null}
               </li>

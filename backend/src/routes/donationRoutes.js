@@ -10,6 +10,12 @@ router.use(authenticateToken);
 router.get('/', authorizeRoles('admin', 'donor'), donationController.listDonations);
 
 router.post(
+  '/self',
+  authorizeRoles('donor'),
+  donationController.createSelfDonation
+);
+
+router.post(
   '/',
   [
     body('donorId').isUUID(),

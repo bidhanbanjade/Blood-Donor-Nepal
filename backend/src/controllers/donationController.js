@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator');
-const { Donation, Donor, BloodBank } = require('../models');
+const { Donation, Donor, BloodBank, sequelize } = require('../models');
 
 const createDonation = async (req, res, next) => {
   try {
@@ -40,6 +40,59 @@ const createDonation = async (req, res, next) => {
   }
 };
 
+const createSelfDonation = async (req, res, next) => {
+  try {
+    const donor = await Donor.findOne({ where: { userId: req.user.id } });
+    if (!donor) {
+      return res.status(404).json({ error: 'Donor profile not found' });
+    }
+
+    const bloodBankMatch = donor.city
+      ? await BloodBank.findOne({
+          where: { city: donor.city },
+          order: [
+            ['isVerified', 'DESC'],
+            ['createdAt', 'ASC'],
+          ],
+        })
+      : null;
+
+    const bloodBank = bloodBankMatch || (await BloodBank.findOne({ order: [['createdAt', 'ASC']] }));
+
+    if (!bloodBank) {
+      return res.status(404).json({ error: 'No blood bank available to record this donation' });
+    }
+
+    const donation = await sequelize.transaction(async (transaction) => {
+      const createdDonation = await Donation.create(
+        {
+          donorId: donor.id,
+          bloodBankId: bloodBank.id,
+          bloodType: donor.bloodType,
+          donationDate: new Date().toISOString().slice(0, 10),
+          unitsDonated: 1,
+          notes: 'Self-reported donation from donor dashboard or alerts page.',
+        },
+        { transaction }
+      );
+
+      await donor.update(
+        {
+          lastDonationDate: createdDonation.donationDate,
+          isEligible: false,
+        },
+        { transaction }
+      );
+
+      return createdDonation;
+    });
+
+    return res.status(201).json(donation);
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const listDonations = async (req, res, next) => {
   try {
     const where = {};
@@ -68,5 +121,6 @@ const listDonations = async (req, res, next) => {
 
 module.exports = {
   createDonation,
+  createSelfDonation,
   listDonations,
 };

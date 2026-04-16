@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { feedbackService } from '../services/feedbackService';
@@ -30,6 +30,7 @@ const DonorDashboard = () => {
   const [eligibilityValue, setEligibilityValue] = useState(true);
   const [eligibilitySaving, setEligibilitySaving] = useState(false);
   const [eligibilityStatus, setEligibilityStatus] = useState('');
+  const [donateActionStatus, setDonateActionStatus] = useState('');
 
   const donorNavItems = useMemo(
     () => [
@@ -48,40 +49,40 @@ const DonorDashboard = () => {
     return exact ? exact.key : 'overview';
   }, [location.pathname, donorNavItems]);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const me = await api.get('/auth/me');
-        setProfile(me.data);
+  const loadData = useCallback(async () => {
+    try {
+      const me = await api.get('/auth/me');
+      setProfile(me.data);
 
-        const donorProfileRes = await api.get('/donors/me');
-        const matchedDonorProfile = donorProfileRes.data;
-        setDonorProfile(matchedDonorProfile || null);
-        setEligibilityValue(Boolean(matchedDonorProfile?.isEligible));
-        setProfileForm({
-          fullName: me.data?.fullName || '',
-          phone: me.data?.phone || '',
-          bloodType: matchedDonorProfile?.bloodType || 'O+',
-          city: matchedDonorProfile?.city || '',
-        });
+      const donorProfileRes = await api.get('/donors/me');
+      const matchedDonorProfile = donorProfileRes.data;
+      setDonorProfile(matchedDonorProfile || null);
+      setEligibilityValue(Boolean(matchedDonorProfile?.isEligible));
+      setProfileForm({
+        fullName: me.data?.fullName || '',
+        phone: me.data?.phone || '',
+        bloodType: matchedDonorProfile?.bloodType || 'O+',
+        city: matchedDonorProfile?.city || '',
+      });
 
-        if (matchedDonorProfile) {
-          const donationsRes = await api.get(`/donations?donorId=${matchedDonorProfile.id}`);
-          setDonations(donationsRes.data);
-        }
-
-        const alertsRes = await api.get('/alerts/public');
-        setAlerts(alertsRes.data || []);
-
-        setStatus('ready');
-      } catch (err) {
-        setError(err.response?.data?.error || 'Could not load donor dashboard');
-        setStatus('error');
+      if (matchedDonorProfile) {
+        const donationsRes = await api.get(`/donations?donorId=${matchedDonorProfile.id}`);
+        setDonations(donationsRes.data);
       }
-    };
 
-    loadData();
+      const alertsRes = await api.get('/alerts/public');
+      setAlerts(alertsRes.data || []);
+
+      setStatus('ready');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Could not load donor dashboard');
+      setStatus('error');
+    }
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   useEffect(() => {
     const intervalId = window.setInterval(async () => {
@@ -206,6 +207,22 @@ const DonorDashboard = () => {
       setEligibilityStatus(saveError.response?.data?.error || 'Could not update eligibility.');
     } finally {
       setEligibilitySaving(false);
+    }
+  };
+
+  const handleDonateNow = async () => {
+    if (!donorProfile?.id) {
+      setDonateActionStatus('Donor profile not found.');
+      return;
+    }
+
+    try {
+      setDonateActionStatus('');
+      await api.post('/donations/self');
+      await loadData();
+      setDonateActionStatus('Donation recorded. Overview updated.');
+    } catch (donateError) {
+      setDonateActionStatus(donateError.response?.data?.error || 'Could not record donation.');
     }
   };
 
@@ -393,12 +410,18 @@ const DonorDashboard = () => {
                   </td>
                   <td>{alert.status}</td>
                   <td>{alert.message}</td>
+                  <td>
+                    <button type="button" className="donor-alert-donate-btn" onClick={handleDonateNow}>
+                      Donate
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
+      {donateActionStatus ? <p className="eligibility-status">{donateActionStatus}</p> : null}
     </section>
   );
 
