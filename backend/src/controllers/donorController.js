@@ -3,6 +3,19 @@ const { Op } = require('sequelize');
 const { sequelize, Donor, User } = require('../models');
 const { haversineDistanceKm } = require('../utils/geo');
 
+const CITY_COORDS = {
+  kathmandu: { lat: 27.7172, lng: 85.324 },
+  'kathmandu valley': { lat: 27.7172, lng: 85.324 },
+  butwal: { lat: 27.7006, lng: 83.4483 },
+  pokhara: { lat: 28.2096, lng: 83.9856 },
+  chitwan: { lat: 27.5291, lng: 84.3542 },
+};
+
+const getFallbackCoords = (city) => {
+  if (!city) return null;
+  return CITY_COORDS[String(city).trim().toLowerCase()] || null;
+};
+
 const searchNearbyDonors = async (req, res, next) => {
   try {
     const lat = Number(req.query.lat);
@@ -15,13 +28,7 @@ const searchNearbyDonors = async (req, res, next) => {
       return res.status(400).json({ error: 'lat and lng query params are required and must be numbers' });
     }
 
-    const approxLatDelta = radius / 111;
-    const approxLngDelta = radius / (111 * Math.cos((lat * Math.PI) / 180));
-
-    const where = {
-      latitude: { [Op.between]: [lat - approxLatDelta, lat + approxLatDelta] },
-      longitude: { [Op.between]: [lng - approxLngDelta, lng + approxLngDelta] },
-    };
+    const where = {};
 
     if (bloodType) {
       where.bloodType = bloodType;
@@ -38,12 +45,24 @@ const searchNearbyDonors = async (req, res, next) => {
 
     const results = candidates
       .map((donor) => {
-        const distanceKm = haversineDistanceKm(lat, lng, donor.latitude, donor.longitude);
+        const donorCoords =
+          donor.latitude != null && donor.longitude != null
+            ? { lat: Number(donor.latitude), lng: Number(donor.longitude) }
+            : getFallbackCoords(donor.city);
+
+        if (!donorCoords) {
+          return null;
+        }
+
+        const distanceKm = haversineDistanceKm(lat, lng, donorCoords.lat, donorCoords.lng);
         return {
           ...donor.toJSON(),
+          latitude: donorCoords.lat,
+          longitude: donorCoords.lng,
           distanceKm: Number(distanceKm.toFixed(2)),
         };
       })
+      .filter(Boolean)
       .filter((donor) => donor.distanceKm <= radius)
       .sort((a, b) => a.distanceKm - b.distanceKm);
 

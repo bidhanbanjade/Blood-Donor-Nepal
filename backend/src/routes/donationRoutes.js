@@ -11,6 +11,9 @@ router.get('/', authorizeRoles('admin', 'donor'), donationController.listDonatio
 
 router.post(
   '/self',
+  [
+    body('alertId').optional().isUUID(),
+  ],
   authorizeRoles('donor'),
   donationController.createSelfDonation
 );

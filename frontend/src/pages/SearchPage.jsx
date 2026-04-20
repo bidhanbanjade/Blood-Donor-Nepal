@@ -31,7 +31,7 @@ const SearchPage = () => {
         lat: String(city.lat),
         lng: String(city.lng),
         radius: '20',
-        eligible: 'true',
+        eligible: 'false',
       });
       if (type) params.set('bloodType', type);
 
@@ -130,7 +130,9 @@ const SearchPage = () => {
               <div className="donor-panel-meta">
                 <span>📍 {selectedDonor.city || activeCity.label}</span>
                 <span>📏 {selectedDonor.distanceKm} km away</span>
-                <span className="donor-panel-eligible">✅ Eligible to donate</span>
+                <span className={selectedDonor.isEligible ? 'donor-panel-eligible' : 'donor-panel-ineligible'}>
+                  {selectedDonor.isEligible ? '✅ Eligible to donate' : '⏸️ Not eligible right now'}
+                </span>
               </div>
               <div className="donor-panel-actions">
                 {selectedDonor.user?.phone && (
@@ -172,7 +174,10 @@ const SearchPage = () => {
                   </div>
                   <div className="donor-list-info">
                     <strong>{donor.user?.fullName || 'Anonymous Donor'}</strong>
-                    <p>{donor.distanceKm} km away · {donor.city || activeCity.label}</p>
+                    <p>
+                      {donor.distanceKm} km away · {donor.city || activeCity.label}
+                      {donor.isEligible ? ' · Eligible' : ' · Not eligible'}
+                    </p>
                   </div>
                   <div className="donor-contact-actions">
                     {donor.user?.phone && (

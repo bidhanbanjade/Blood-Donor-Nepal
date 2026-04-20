@@ -271,6 +271,11 @@
   color: #166534 !important;
 }
 
+.donor-panel-ineligible {
+  background: #fee2e2 !important;
+  color: #9f1239 !important;
+}
+
 .donor-panel-actions {
   display: flex;
   gap: 0.6rem;

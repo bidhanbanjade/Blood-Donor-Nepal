@@ -165,6 +165,13 @@
   box-shadow: 0 10px 20px rgba(15, 106, 63, 0.22);
 }
 
+.donate-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .donated-pill {
   display: inline-flex;
   align-items: center;

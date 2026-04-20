@@ -9,6 +9,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import SearchPage from './pages/SearchPage';
 import AlertsPage from './pages/AlertsPage';
 import ChatbotPage from './pages/ChatbotPage';
+import DonorDonatePage from './pages/DonorDonatePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -71,6 +72,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['donor', 'admin']}>
                   <DonorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/donor-dashboard/donate"
+              element={
+                <ProtectedRoute allowedRoles={['donor', 'admin']}>
+                  <DonorDonatePage />
                 </ProtectedRoute>
               }
             />
