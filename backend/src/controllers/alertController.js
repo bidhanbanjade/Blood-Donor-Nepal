@@ -189,8 +189,8 @@ const listPublicAlerts = async (req, res, next) => {
         },
       },
       include: [
-        { model: BloodBank, as: 'bloodBank', attributes: ['id', 'name', 'city'] },
-        { model: Hospital, as: 'hospital', attributes: ['id', 'name', 'city'] },
+        { model: BloodBank, as: 'bloodBank', attributes: ['id', 'name', 'city', 'contactPhone'] },
+        { model: Hospital, as: 'hospital', attributes: ['id', 'name', 'city', 'contactPhone'] },
       ],
       order: [['createdAt', 'DESC']],
       limit: 50,
@@ -217,8 +217,8 @@ const listAlertHistory = async (req, res, next) => {
     const alerts = await Alert.findAll({
       where,
       include: [
-        { model: BloodBank, as: 'bloodBank', attributes: ['id', 'name', 'city'] },
-        { model: Hospital, as: 'hospital', attributes: ['id', 'name', 'city'] },
+        { model: BloodBank, as: 'bloodBank', attributes: ['id', 'name', 'city', 'contactPhone'] },
+        { model: Hospital, as: 'hospital', attributes: ['id', 'name', 'city', 'contactPhone'] },
       ],
       order: [['createdAt', 'DESC']],
       limit: 50,

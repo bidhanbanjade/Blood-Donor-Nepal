@@ -22,7 +22,7 @@ const register = async (req, res, next) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullName, email, password, role, phone, bloodType } = req.body;
+    const { fullName, email, password, role, phone, bloodType, city, latitude, longitude } = req.body;
     const normalizedEmail = String(email || '').trim().toLowerCase();
     const normalizedPhone = normalizePhone(phone);
 
@@ -62,10 +62,18 @@ const register = async (req, res, next) => {
       );
 
       if (role === 'donor') {
+        const parsedLatitude =
+          latitude !== undefined && latitude !== null && latitude !== '' ? Number(latitude) : null;
+        const parsedLongitude =
+          longitude !== undefined && longitude !== null && longitude !== '' ? Number(longitude) : null;
+
         await Donor.create(
           {
             userId: createdUser.id,
             bloodType,
+            city: typeof city === 'string' ? city.trim() || null : null,
+            latitude: Number.isFinite(parsedLatitude) ? parsedLatitude : null,
+            longitude: Number.isFinite(parsedLongitude) ? parsedLongitude : null,
           },
           { transaction }
         );

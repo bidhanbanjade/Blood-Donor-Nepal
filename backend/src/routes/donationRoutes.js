@@ -13,6 +13,7 @@ router.post(
   '/self',
   [
     body('alertId').optional().isUUID(),
+    body('requestId').optional().isUUID(),
   ],
   authorizeRoles('donor'),
   donationController.createSelfDonation

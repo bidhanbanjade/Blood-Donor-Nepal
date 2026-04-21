@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator');
-const { Donation, Donor, BloodBank, Alert, sequelize } = require('../models');
+const { Donation, Donor, BloodBank, Alert, PublicBloodRequest, sequelize } = require('../models');
 
 const createDonation = async (req, res, next) => {
   try {
@@ -61,10 +61,18 @@ const createSelfDonation = async (req, res, next) => {
     }
 
     let alert = null;
+    let publicRequest = null;
     if (req.body.alertId) {
       alert = await Alert.findByPk(req.body.alertId);
       if (!alert) {
         return res.status(404).json({ error: 'Alert not found' });
+      }
+    }
+
+    if (req.body.requestId) {
+      publicRequest = await PublicBloodRequest.findByPk(req.body.requestId);
+      if (!publicRequest) {
+        return res.status(404).json({ error: 'Public request not found' });
       }
     }
 
@@ -107,6 +115,10 @@ const createSelfDonation = async (req, res, next) => {
 
       if (alert) {
         await alert.update({ status: 'closed' }, { transaction });
+      }
+
+      if (publicRequest) {
+        await publicRequest.update({ status: 'closed' }, { transaction });
       }
 
       return createdDonation;

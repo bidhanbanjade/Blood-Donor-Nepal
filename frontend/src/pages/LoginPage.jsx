@@ -58,100 +58,110 @@ const LoginPage = () => {
 
   return (
     <main className="login-page">
-      <section className="login-shell">
-        <aside className="login-showcase" aria-label="Blood Donor Nepal login overview">
+      <div className="login-background" aria-hidden="true">
+        <span className="bg-connector connector-top-left" />
+        <span className="bg-connector connector-top-right" />
+        <span className="bg-connector connector-bottom-left" />
+        <span className="bg-connector connector-bottom-right" />
+        <span className="connector-node node-top-left" />
+        <span className="connector-node node-top-right" />
+        <span className="connector-node node-bottom-left" />
+        <span className="connector-node node-bottom-right" />
+        <span className="blood-drop drop-one" />
+        <span className="blood-drop drop-two" />
+        <span className="blood-drop drop-three" />
+        <span className="blood-drop drop-four" />
+        <span className="blood-drop drop-five" />
+        <span className="blood-drop drop-six" />
+        <span className="blood-drop drop-seven" />
+      </div>
+
+      <section className="login-shell" aria-live="polite">
+        <div className="login-mark-wrap">
           <div className="login-showcase-mark">Blood Donor Nepal</div>
-          <h2>Welcome back to the emergency response network.</h2>
-          <p>
-            Sign in to coordinate donor outreach, monitor urgent requests, and keep blood inventory
-            moving where it is needed most.
-          </p>
-          <ul>
-            <li>Area-based donor search</li>
-            <li>Urgent alert management</li>
-            <li>Role-specific dashboards</li>
-          </ul>
-          <div className="login-showcase-links">
-            <Link to="/">Back to Home</Link>
-            <Link to="/search">Explore Search Page</Link>
+          <div className="login-mark-icon" aria-hidden="true">
+            <span />
           </div>
-        </aside>
+        </div>
 
-        <section className="login-card" aria-live="polite">
-          <h1>Sign In</h1>
-          <p className="login-subtitle">Use your account credentials to continue.</p>
+        <h1>Welcome Back</h1>
+        <p className="login-subtitle">
+          Sign in to manage donor outreach, urgent alerts, and blood requests.
+        </p>
 
-          <form onSubmit={handleSubmit} className="login-form">
-            <div className="login-methods" role="group" aria-label="Choose login method">
-              <button
-                type="button"
-                className={loginMethod === 'email' ? 'method-btn active' : 'method-btn'}
-                onClick={() => {
-                  setLoginMethod('email');
-                  setIdentifier('');
-                }}
-              >
-                Email
-              </button>
-              <button
-                type="button"
-                className={loginMethod === 'phone' ? 'method-btn active' : 'method-btn'}
-                onClick={() => {
-                  setLoginMethod('phone');
-                  setIdentifier('');
-                }}
-              >
-                Phone
-              </button>
-            </div>
-
-            <label htmlFor="identifier">{loginMethod === 'email' ? 'Email' : 'Phone Number'}</label>
-            <input
-              id="identifier"
-              type={loginMethod === 'email' ? 'email' : 'tel'}
-              value={identifier}
-              onChange={(event) => setIdentifier(event.target.value)}
-              placeholder={loginMethod === 'email' ? 'admin@example.com' : '+977...'}
-              autoComplete={loginMethod === 'email' ? 'email' : 'tel'}
-            />
-
-            <label htmlFor="password">Password</label>
-            <div className="password-field">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="Password123"
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                className="toggle-password"
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-            </div>
-
-            {error ? <p className="login-error">{error}</p> : null}
-
-            <button type="submit" disabled={submitting || loading} className="submit-btn">
-              {submitting ? 'Signing in...' : loading ? 'Checking session...' : 'Sign In'}
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="login-methods" role="group" aria-label="Choose login method">
+            <button
+              type="button"
+              className={loginMethod === 'email' ? 'method-btn active' : 'method-btn'}
+              onClick={() => {
+                setLoginMethod('email');
+                setIdentifier('');
+              }}
+            >
+              Email
             </button>
-          </form>
-
-          <div className="login-hints">
-            <p className="login-hints-title">Quick test users</p>
-            <p>Admin: admin@gmail.com / BB23</p>
-            <p>Donor: donor@example.com</p>
+            <button
+              type="button"
+              className={loginMethod === 'phone' ? 'method-btn active' : 'method-btn'}
+              onClick={() => {
+                setLoginMethod('phone');
+                setIdentifier('');
+              }}
+            >
+              Phone
+            </button>
           </div>
 
-          <p className="login-register-link">
-            New here? <Link to="/register">Create an account</Link>
-          </p>
-        </section>
+          <label htmlFor="identifier">{loginMethod === 'email' ? 'Email' : 'Phone Number'}</label>
+          <input
+            id="identifier"
+            type={loginMethod === 'email' ? 'email' : 'tel'}
+            value={identifier}
+            onChange={(event) => setIdentifier(event.target.value)}
+            placeholder={loginMethod === 'email' ? 'admin@example.com' : '+977...'}
+            autoComplete={loginMethod === 'email' ? 'email' : 'tel'}
+          />
+
+          <label htmlFor="password">Password</label>
+          <div className="password-field">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Password123"
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
+
+          {error ? <p className="login-error">{error}</p> : null}
+
+          <button type="submit" disabled={submitting || loading} className="submit-btn">
+            {submitting ? 'Signing in...' : loading ? 'Checking session...' : 'Sign In'}
+          </button>
+        </form>
+
+        <div className="login-divider">
+          <span>Quick Access</span>
+        </div>
+
+        <div className="login-showcase-links">
+          <Link to="/">Back to Home</Link>
+          <Link to="/search">Explore Search</Link>
+        </div>
+
+        <p className="login-register-link">
+          New here? <Link to="/register">Create an account</Link>
+        </p>
       </section>
     </main>
   );

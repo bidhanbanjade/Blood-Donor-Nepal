@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -25,6 +27,10 @@
   --shadow-sm: 0 10px 24px rgba(11, 30, 53, 0.07);
   --shadow-md: 0 18px 40px rgba(11, 30, 53, 0.1);
   --shadow-lg: 0 28px 60px rgba(11, 30, 53, 0.14);
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --transition: 0.22s cubic-bezier(0.2, 0.65, 0.3, 1);
   font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -57,9 +63,10 @@ body {
   min-height: 100vh;
   color: var(--text);
   background:
-    radial-gradient(circle at 8% 8%, rgba(191, 232, 255, 0.28), transparent 32%),
-    radial-gradient(circle at 92% 18%, rgba(255, 201, 187, 0.24), transparent 34%),
-    linear-gradient(180deg, #f8fbff 0%, #f5f8fc 42%, #eef3f8 100%);
+    radial-gradient(circle at 8% 8%, rgba(191, 232, 255, 0.34), transparent 36%),
+    radial-gradient(circle at 92% 18%, rgba(255, 201, 187, 0.3), transparent 38%),
+    radial-gradient(circle at 52% 94%, rgba(179, 214, 255, 0.2), transparent 42%),
+    linear-gradient(180deg, #f9fcff 0%, #f4f8fd 40%, #edf3f8 100%);
   background-attachment: fixed;
 }
 
@@ -76,6 +83,8 @@ a {
 button {
   font-family: inherit;
   cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition),
+    background-color var(--transition), border-color var(--transition), color var(--transition);
 }
 
 button,
@@ -97,4 +106,15 @@ textarea:focus-visible {
 ::selection {
   background: rgba(180, 36, 30, 0.16);
   color: var(--text);
+}
+
+input,
+select,
+textarea {
+  border-radius: var(--radius-sm);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--muted) 82%, white 18%);
 }

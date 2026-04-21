@@ -501,11 +501,6 @@ const AdminDashboard = () => {
 
         <div className="admin-workspace">
           <header className="admin-topbar">
-            <input
-              type="search"
-              className="admin-search"
-              placeholder="Search alerts, donors, or blood groups"
-            />
             <div className="admin-user-chip">
               <span className="admin-avatar">A</span>
               <span>Admin</span>

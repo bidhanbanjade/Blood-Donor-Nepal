@@ -35,10 +35,10 @@ module.exports = {
     twilioFrom: process.env.TWILIO_FROM || ''
   },
   email: {
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: process.env.EMAIL_PORT || 587,
-    user: process.env.EMAIL_USER || '',
-    password: process.env.EMAIL_PASSWORD || ''
+    host: process.env.EMAIL_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: Number(process.env.EMAIL_PORT || process.env.SMTP_PORT || 587),
+    user: process.env.EMAIL_USER || process.env.SMTP_USER || '',
+    password: process.env.EMAIL_PASSWORD || process.env.SMTP_PASS || ''
   }
 };
 

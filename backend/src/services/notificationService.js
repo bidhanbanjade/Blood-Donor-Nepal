@@ -8,7 +8,9 @@ if (config.webPush.publicKey && config.webPush.privateKey) {
 }
 
 const createTransporter = () => {
-  if (!config.email.user || !config.email.password) {
+  const { user: smtpUser, password: smtpPass } = getEmailCredentials();
+
+  if (!smtpUser || !smtpPass) {
     return null;
   }
 
@@ -17,8 +19,8 @@ const createTransporter = () => {
     port: config.email.port,
     secure: false,
     auth: {
-      user: config.email.user,
-      pass: config.email.password,
+      user: smtpUser,
+      pass: smtpPass,
     },
   });
 };
@@ -27,6 +29,22 @@ const twilioClient =
   config.sms.twilioSid && config.sms.twilioToken
     ? twilio(config.sms.twilioSid, config.sms.twilioToken)
     : null;
+
+const getEmailCredentials = () => ({
+  user:
+    config.email.user ||
+    process.env.SMTP_USER ||
+    process.env.EMAIL_USER ||
+    '',
+  password:
+    config.email.password ||
+    process.env.SMTP_PASS ||
+    process.env.EMAIL_PASSWORD ||
+    '',
+});
+
+const getEmailFromAddress = () =>
+  process.env.SMTP_FROM_EMAIL || process.env.EMAIL_FROM || getEmailCredentials().user || '';
 
 const sendPushNotification = async (subscription, payload) => {
   if (!config.webPush.publicKey || !config.webPush.privateKey) {
@@ -53,8 +71,10 @@ const sendEmailNotification = async ({ to, subject, text }) => {
     return { sent: false, reason: 'Email credentials not configured' };
   }
 
+  const fromAddress = getEmailFromAddress();
+
   await transporter.sendMail({
-    from: config.email.user,
+    from: fromAddress,
     to,
     subject,
     text,

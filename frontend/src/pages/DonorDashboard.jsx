@@ -32,6 +32,49 @@ const DonorDashboard = () => {
   const [eligibilityStatus, setEligibilityStatus] = useState('');
   const [donateActionStatus, setDonateActionStatus] = useState('');
 
+  const fetchCombinedAlerts = useCallback(async () => {
+    const [adminAlertsRes, publicRequestsRes] = await Promise.all([
+      api.get('/alerts/public'),
+      api.get('/public-requests/public'),
+    ]);
+
+    const adminAlerts = (adminAlertsRes.data || []).map((alert) => ({
+      id: `admin-${alert.id}`,
+      sourceType: 'admin',
+      sourceLabel: 'Admin Alert',
+      createdAt: alert.createdAt,
+      bloodType: alert.bloodType,
+      urgency: alert.urgency,
+      status: alert.status,
+      message: alert.message,
+      city: alert.bloodBank?.city || alert.hospital?.city || '-',
+      unitsNeeded: '-',
+      receiverName: alert.bloodBank?.name || alert.hospital?.name || 'Health Facility',
+      receiverPhone: alert.bloodBank?.contactPhone || alert.hospital?.contactPhone || null,
+      alertId: alert.id,
+    }));
+
+    const publicRequests = (publicRequestsRes.data || []).map((request) => ({
+      id: `public-${request.id}`,
+      sourceType: 'public',
+      sourceLabel: 'Public Request',
+      createdAt: request.createdAt,
+      bloodType: request.bloodType,
+      urgency: request.urgency,
+      status: request.status || 'open',
+      message: request.message,
+      city: request.city || '-',
+      unitsNeeded: request.unitsNeeded || '-',
+      receiverName: request.fullName || 'Requester',
+      receiverPhone: request.phone || null,
+      alertId: null,
+    }));
+
+    return [...adminAlerts, ...publicRequests].sort(
+      (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    );
+  }, []);
+
   const donorNavItems = useMemo(
     () => [
       { key: 'overview', label: 'Overview', path: '/donor-dashboard' },
@@ -70,15 +113,15 @@ const DonorDashboard = () => {
         setDonations(donationsRes.data);
       }
 
-      const alertsRes = await api.get('/alerts/public');
-      setAlerts(alertsRes.data || []);
+      const combinedAlerts = await fetchCombinedAlerts();
+      setAlerts(combinedAlerts);
 
       setStatus('ready');
     } catch (err) {
       setError(err.response?.data?.error || 'Could not load donor dashboard');
       setStatus('error');
     }
-  }, []);
+  }, [fetchCombinedAlerts]);
 
   useEffect(() => {
     loadData();
@@ -87,8 +130,8 @@ const DonorDashboard = () => {
   useEffect(() => {
     const intervalId = window.setInterval(async () => {
       try {
-        const alertsRes = await api.get('/alerts/public');
-        setAlerts(alertsRes.data || []);
+        const combinedAlerts = await fetchCombinedAlerts();
+        setAlerts(combinedAlerts);
       } catch (_) {
         // Keep previous alert list if a refresh call fails.
       }
@@ -97,7 +140,7 @@ const DonorDashboard = () => {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, []);
+  }, [fetchCombinedAlerts]);
 
   const nextEligibleDate = useMemo(() => {
     if (!donations.length) {
@@ -210,20 +253,30 @@ const DonorDashboard = () => {
     }
   };
 
-  const handleDonateNow = async () => {
+  const handleDonateNow = async (alertItem) => {
     if (!donorProfile?.id) {
       setDonateActionStatus('Donor profile not found.');
       return;
     }
 
-    try {
-      setDonateActionStatus('');
-      await api.post('/donations/self');
-      await loadData();
-      setDonateActionStatus('Donation recorded. Overview updated.');
-    } catch (donateError) {
-      setDonateActionStatus(donateError.response?.data?.error || 'Could not record donation.');
-    }
+    navigate('/donor-dashboard/donate', {
+      state: {
+        donationTarget: {
+          kind: alertItem?.sourceType === 'public' ? 'request' : 'alert',
+          id: alertItem.id.replace(/^admin-|^public-/, ''),
+          bloodType: alertItem.bloodType,
+          urgency: alertItem.urgency,
+          message: alertItem.message,
+          unitsNeeded: alertItem.unitsNeeded || null,
+          location: alertItem.city || null,
+          phone: alertItem.receiverPhone || null,
+          createdAt: alertItem.createdAt,
+          receiverName: alertItem.receiverName || null,
+          sourceLabel: alertItem.sourceLabel,
+          alertId: alertItem.alertId || null,
+        },
+      },
+    });
   };
 
   const handleHome = () => {
@@ -392,16 +445,21 @@ const DonorDashboard = () => {
             <thead>
               <tr>
                 <th>Date</th>
+                <th>Source</th>
                 <th>Blood Type</th>
                 <th>Urgency</th>
                 <th>Status</th>
+                <th>City</th>
+                <th>Units</th>
                 <th>Message</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {alerts.map((alert) => (
                 <tr key={alert.id}>
                   <td>{alert.createdAt?.slice(0, 10) || '-'}</td>
+                  <td>{alert.sourceLabel}</td>
                   <td>{alert.bloodType}</td>
                   <td>
                     <span className={`donor-alert-urgency donor-alert-urgency-${alert.urgency}`}>
@@ -409,10 +467,16 @@ const DonorDashboard = () => {
                     </span>
                   </td>
                   <td>{alert.status}</td>
+                  <td>{alert.city}</td>
+                  <td>{alert.unitsNeeded}</td>
                   <td>{alert.message}</td>
                   <td>
-                    <button type="button" className="donor-alert-donate-btn" onClick={handleDonateNow}>
-                      Donate
+                    <button
+                      type="button"
+                      className="donor-alert-donate-btn"
+                      onClick={() => handleDonateNow(alert)}
+                    >
+                      View Details
                     </button>
                   </td>
                 </tr>

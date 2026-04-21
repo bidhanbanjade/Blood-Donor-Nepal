@@ -68,7 +68,13 @@ const DonorDonatePage = () => {
     try {
       setSaving(true);
       setStatus('');
-      const payload = donationTarget.kind === 'alert' ? { alertId: donationTarget.id } : {};
+      let payload = {};
+      if (donationTarget.kind === 'alert') {
+        payload = { alertId: donationTarget.id };
+      }
+      if (donationTarget.kind === 'request') {
+        payload = { requestId: donationTarget.id };
+      }
       await api.post('/donations/self', payload);
       storeDonatedId(donationTarget.kind, donationTarget.id);
       navigate('/alerts', {
@@ -90,8 +96,21 @@ const DonorDonatePage = () => {
   return (
     <main className="donor-donate-page">
       <section className="donor-donate-card">
-        <h1>Confirm Donation</h1>
-        <p>Review alert details before confirming your donation.</p>
+        <h1>Donation Details</h1>
+        <p>Review receiver details before confirming your donation.</p>
+
+        <div className="donor-donate-receiver-card">
+          <div>
+            <span className="donor-donate-label">Receiver</span>
+            <h2>{donationTarget.receiverName || donationTarget.requesterName || 'Receiver'}</h2>
+            <p>{donationTarget.sourceLabel || donationTarget.kind}</p>
+          </div>
+          {donationTarget.phone ? (
+            <a className="donor-donate-call-btn" href={`tel:${donationTarget.phone}`}>
+              Call Receiver
+            </a>
+          ) : null}
+        </div>
 
         <div className="donor-donate-grid">
           <p><strong>Blood Group Needed:</strong> {donationTarget.bloodType || 'N/A'}</p>
@@ -125,9 +144,6 @@ const DonorDonatePage = () => {
           <button type="button" className="donor-donate-cancel-btn" onClick={() => navigate('/alerts')}>
             Cancel
           </button>
-          {donationTarget.phone ? (
-            <a className="donor-donate-call-btn" href={`tel:${donationTarget.phone}`}>Call Requester</a>
-          ) : null}
         </div>
       </section>
     </main>

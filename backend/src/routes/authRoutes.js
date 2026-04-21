@@ -15,6 +15,15 @@ router.post(
       .isIn(['donor', 'admin'])
       .withMessage('Role must be donor or admin'),
     body('phone').optional().isString(),
+    body('city').optional({ values: 'falsy' }).isString().withMessage('City must be a string'),
+    body('latitude')
+      .optional({ values: 'falsy' })
+      .isFloat({ min: -90, max: 90 })
+      .withMessage('Latitude must be between -90 and 90'),
+    body('longitude')
+      .optional({ values: 'falsy' })
+      .isFloat({ min: -180, max: 180 })
+      .withMessage('Longitude must be between -180 and 180'),
     body('bloodType')
       .optional({ values: 'falsy' })
       .isIn(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
