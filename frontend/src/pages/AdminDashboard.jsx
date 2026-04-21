@@ -12,7 +12,6 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const alertsPerPage = 8;
-  const [inventory, setInventory] = useState([]);
   const [donors, setDonors] = useState([]);
   const [alertHistory, setAlertHistory] = useState([]);
   const [publicRequests, setPublicRequests] = useState([]);
@@ -30,11 +29,6 @@ const AdminDashboard = () => {
     longitude: 85.324,
   });
   const [feedback, setFeedback] = useState('');
-
-  const totalUnits = useMemo(
-    () => inventory.reduce((sum, item) => sum + Number(item.unitsAvailable || 0), 0),
-    [inventory]
-  );
 
   const criticalAlerts = useMemo(
     () => alertHistory.filter((alert) => alert.urgency === 'critical').length,
@@ -60,13 +54,11 @@ const AdminDashboard = () => {
 
   const loadData = useCallback(async ({ silent = false } = {}) => {
     try {
-      const [invRes, donorRes, historyRes, publicReqRes] = await Promise.all([
-        api.get('/inventory'),
+      const [donorRes, historyRes, publicReqRes] = await Promise.all([
         api.get('/donors'),
         api.get('/alerts/history'),
         api.get('/public-requests/public'),
       ]);
-      setInventory(invRes.data);
       setDonors(donorRes.data);
       setAlertHistory(historyRes.data);
       setPublicRequests(publicReqRes.data);
@@ -235,11 +227,6 @@ const AdminDashboard = () => {
 
       <section className="stat-grid">
         <article className="stat-card stat-card-primary">
-          <h3>Total Units</h3>
-          <p>{totalUnits}</p>
-          <small>Available across inventory</small>
-        </article>
-        <article className="stat-card">
           <h3>Donors</h3>
           <p>{donors.length}</p>
           <small>Registered and visible</small>
