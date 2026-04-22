@@ -50,7 +50,11 @@ const LoginPage = () => {
       const result = await login(payload);
       navigate(getRoleRedirectPath(result.user.role), { replace: true });
     } catch (submitError) {
-      setError(submitError.response?.data?.error || 'Login failed. Please verify credentials.');
+      if (submitError.response?.status === 401) {
+        setError('Invalid credentials. Please check your email/phone and password.');
+      } else {
+        setError(submitError.response?.data?.error || 'Login failed. Please verify credentials.');
+      }
     } finally {
       setSubmitting(false);
     }
